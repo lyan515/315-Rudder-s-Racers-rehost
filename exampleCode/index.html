@@ -26,15 +26,15 @@
 
         }
 	
-	var s;
+	var bluebike;
 
         function create () {
 
             var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
             logo.anchor.setTo(0.5, 0.5);
-	    s = game.add.sprite(game.world.centerX, game.world.centerY, 'bluebike');
-	    s.anchor.setTo(0.5, 0.5);
-    	    s.scale.setTo(0.5, 0.5);
+	    bluebike = game.add.sprite(game.world.centerX, game.world.centerY, 'bluebike');
+	    bluebike.anchor.setTo(0.5, 0.5);
+    	    bluebike.scale.setTo(0.5, 0.5);
 
         }
 
@@ -42,24 +42,24 @@
 
     	    if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
     	    {
-        	s.x -= 5;
-		s.angle = 270;
+        	bluebike.x -= 5;
+		bluebike.angle = 270;
     	    }
     	    else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
     	    {
-        	s.x += 5;
-		s.angle = 90;
+        	bluebike.x += 5;
+		bluebike.angle = 90;
     	    }
 
     	    if (game.input.keyboard.isDown(Phaser.Keyboard.UP))
     	    {
-        	s.y -= 5;
-		s.angle = 0;
+        	bluebike.y -= 5;
+		bluebike.angle = 0;
     	    }
     	    else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
     	    {
-        	s.y += 5;
-		s.angle = 180;
+        	bluebike.y += 5;
+		bluebike.angle = 180;
     	    }
 
 	}	
