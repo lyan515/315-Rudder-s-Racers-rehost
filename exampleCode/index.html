@@ -40,7 +40,31 @@
 
 	function update() {
 
-    	    if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
+    	    if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT)&& game.input.keyboard.isDown(Phaser.Keyboard.UP))
+    	    {
+        	bluebike.x -= 5;
+			bluebike.y -= 5;
+		bluebike.angle = 315;
+    	    }
+    	    else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)&& game.input.keyboard.isDown(Phaser.Keyboard.UP))
+    	    {
+        	bluebike.x += 5;
+			bluebike.y -= 5;
+		bluebike.angle = 45;
+    	    }
+			else if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT)&& game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
+    	    {
+        	bluebike.x -= 5;
+			bluebike.y += 5;
+		bluebike.angle = 225;
+    	    }
+    	    else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)&& game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
+    	    {
+        	bluebike.x += 5;
+			bluebike.y += 5;
+		bluebike.angle = 135;
+    	    }
+			else if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
     	    {
         	bluebike.x -= 5;
 		bluebike.angle = 270;
@@ -50,8 +74,7 @@
         	bluebike.x += 5;
 		bluebike.angle = 90;
     	    }
-
-    	    if (game.input.keyboard.isDown(Phaser.Keyboard.UP))
+    	    else if (game.input.keyboard.isDown(Phaser.Keyboard.UP))
     	    {
         	bluebike.y -= 5;
 		bluebike.angle = 0;
@@ -61,7 +84,8 @@
         	bluebike.y += 5;
 		bluebike.angle = 180;
     	    }
-
+			
+			
 	}	
 
     };
