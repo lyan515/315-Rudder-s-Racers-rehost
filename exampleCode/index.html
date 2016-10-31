@@ -43,19 +43,23 @@
     	    if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
     	    {
         	s.x -= 5;
+		s.angle = 270;
     	    }
     	    else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
     	    {
         	s.x += 5;
+		s.angle = 90;
     	    }
 
     	    if (game.input.keyboard.isDown(Phaser.Keyboard.UP))
     	    {
         	s.y -= 5;
+		s.angle = 0;
     	    }
     	    else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
     	    {
         	s.y += 5;
+		s.angle = 180;
     	    }
 
 	}	
