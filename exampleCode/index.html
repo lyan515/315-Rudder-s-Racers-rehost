@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+
 <head>
     <meta charset="UTF-8" />
     <title>Rudder's Racers</title>
@@ -8,12 +9,14 @@
 </head>
 <body>
 
+
 <script src="client.js"></script>
 <script type="text/javascript">
 
 window.onload = function() {
 
     var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render });
+
 
     function preload () {
 
@@ -27,6 +30,7 @@ window.onload = function() {
     var cursors;
     var speed = 5;
     var turnSpeed = 0.05;
+
 
     function create () {
 
@@ -50,6 +54,7 @@ window.onload = function() {
         cursors = game.input.keyboard.createCursorKeys();
 
     }
+
 
     function toDegrees (angle) {
         return angle * (180 / Math.PI);
