@@ -1,98 +1,94 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>hello phaser!</title>
-        <script src="//cdn.jsdelivr.net/phaser/2.5.0/phaser.min.js"></script>
-		<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
-    </head>
-    <body>
-	
-	<script src="client.js"></script>
-    <script type="text/javascript">
+<head>
+    <meta charset="UTF-8" />
+    <title>Rudder's Racers</title>
+    <script src="//cdn.jsdelivr.net/phaser/2.6.2/phaser.min.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+</head>
+<body>
 
-    window.onload = function() {
+<script src="client.js"></script>
+<script type="text/javascript">
 
-        //  Note that this html file is set to pull down Phaser 2.5.0 from the JS Delivr CDN.
-        //  Although it will work fine with this tutorial, it's almost certainly not the most current version.
-        //  Be sure to replace it with an updated version before you start experimenting with adding your own code.
+window.onload = function() {
 
-        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+    var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
-        function preload () {
+    function preload () {
 
-            game.load.image('logo', 'phaser.png');
-	    game.load.image('bluebike', 'bluebike.png');
+        game.load.image('logo', 'assets/phaser.png');
+        game.load.image('player', 'assets/bluebike.png');
 
+    }
+
+    var player;
+    var cursors;
+    var speed = 400;
+
+    function create () {
+
+        // enable Arcade Physics system
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+
+        // background logo
+        var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
+        logo.anchor.setTo(0.5, 0.5);
+
+        // player
+        player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
+        player.anchor.setTo(0.5, 0.5);
+	    player.scale.setTo(0.5, 0.5);
+        // player.enableBody = true;
+        game.physics.arcade.enable(player);
+
+        // controls
+        cursors = game.input.keyboard.createCursorKeys();
+
+    }
+
+    function update() {
+
+        // reset the player's velocity
+        player.body.velocity.x = 0;
+        player.body.velocity.y = 0;
+
+        if (cursors.left.isDown) {
+            // move left
+            player.body.velocity.x = -speed;
+            player.angle = -90;
         }
-	
-	var bluebike;
-
-        function create () {
-
-            var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
-            logo.anchor.setTo(0.5, 0.5);
-	    bluebike = game.add.sprite(game.world.centerX, game.world.centerY, 'bluebike');
-	    bluebike.anchor.setTo(0.5, 0.5);
-    	    bluebike.scale.setTo(0.5, 0.5);
-
+        else if (cursors.right.isDown) {
+            // move right
+            player.body.velocity.x = speed;
+            player.angle = 90;
         }
+        if (cursors.up.isDown) {
+            // move up
+            player.body.velocity.y = -speed;
+            if (player.body.velocity.x != 0) {
+                player.angle -= (45 * Math.sign(player.body.velocity.x));
+            }
+            else {
+                player.angle = 0;
+            }
+        }
+        if (cursors.down.isDown) {
+            // move down
+            player.body.velocity.y = speed;
+            if (player.body.velocity.x != 0) {
+                player.angle += (45 * Math.sign(player.body.velocity.x));
+            }
+            else {
+                player.angle = 180;
+            }
+        }    		
+    		
+    }	
 
-	function update() {
+}
 
-    	    if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT)&& game.input.keyboard.isDown(Phaser.Keyboard.UP))
-    	    {
-        	bluebike.x -= 5;
-			bluebike.y -= 5;
-		bluebike.angle = 315;
-    	    }
-    	    else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)&& game.input.keyboard.isDown(Phaser.Keyboard.UP))
-    	    {
-        	bluebike.x += 5;
-			bluebike.y -= 5;
-		bluebike.angle = 45;
-    	    }
-			else if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT)&& game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
-    	    {
-        	bluebike.x -= 5;
-			bluebike.y += 5;
-		bluebike.angle = 225;
-    	    }
-    	    else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)&& game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
-    	    {
-        	bluebike.x += 5;
-			bluebike.y += 5;
-		bluebike.angle = 135;
-    	    }
-			else if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
-    	    {
-        	bluebike.x -= 5;
-		bluebike.angle = 270;
-    	    }
-    	    else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
-    	    {
-        	bluebike.x += 5;
-		bluebike.angle = 90;
-    	    }
-    	    else if (game.input.keyboard.isDown(Phaser.Keyboard.UP))
-    	    {
-        	bluebike.y -= 5;
-		bluebike.angle = 0;
-    	    }
-    	    else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
-    	    {
-        	bluebike.y += 5;
-		bluebike.angle = 180;
-    	    }
-			
-			
-	}	
+</script>
 
-    };
-
-
-
-    </script>
-	
-    </body>
+</body>
 </html>
