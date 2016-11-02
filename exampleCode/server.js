@@ -1,6 +1,8 @@
 var app = require('express')();
 var http = require('http').Server(app);
-var socket = require('socket.io')(http);
+var io = require('socket.io')(http);
+
+var Player = require('./player')
 
 var fs = require('fs');
 var path = require('path');
@@ -60,6 +62,7 @@ app.get('/*', function(request, response){
 
 });
 
+
 var setEventHandlers = function (socket) {
   // Socket.IO
   socket.on('connection', onSocketConnection(socket));
@@ -67,28 +70,80 @@ var setEventHandlers = function (socket) {
   socket.on('disconnect', onSocketDisconnect(socket));
 }
 
-socket.on('connection', function(socket) {
-	connectionCount = connectionCount + 1;
-	console.log('New player has connected', connectionCount)
+
+
+//https://github.com/xicombd/phaser-multiplayer-game
+
+var players;
+
+http.listen(31337, function(){
+	console.log('listening on *:31338'); //changed from 31337 for testing purposes
+	init();
+});
+
+function init() {
+	players = [];
+	socket = io.listen(http);
 	
-	socket.emit('updateCount', {c: connectionCount});
-	socket.broadcast.emit('updateCount', {c: connectionCount});
-	// Listen for client disconnected
+	setEventHandlers();
+};
+
+var setEventHandlers = function() {
+	socket.sockets.on('connection', onSocketConnection);
+};
+
+function onSocketConnection(client) {
+	console.log('Player connected');
 	
-});
+	client.on('newPlayer', onNewPlayer);
+	client.on('movePlayer', onMovePlayer);
+	
+};
 
-socket.on('disconnect', function(socket) {
-	console.log('Player has disconnected');
-	connectionCount = connectionCount - 1;
-	//var count = {c: connectionCount};
-	socket.emit('updateCount', {c: connectionCount});
-	socket.broadcast.emit('updateCount', {c: connectionCount});
-});
+function onNewPlayer(data) {
+	var newPlayer = new Player(data.x, data.y, data.angle);
+	newPlayer.id = this.id;
+	
+	this.broadcast.emit('newPlayer', {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), angle: newPlayer.getAngle()});
+	
+	 var i, existingPlayer;
+	for (i = 0; i < players.length; i++) {
+		existingPlayer = players[i]
+		this.emit('newPlayer', {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle()});
+	}
+	
+	players.push(newPlayer);
+}
 
-http.listen(31338, function(){
-  console.log('listening on *:31338'); //changed from 31337 for testing purposes
+function onMovePlayer (data) {
+	// Find player in array
+	var movePlayer = playerById(this.id);
 
-});
+	// Player not found
+	if (!movePlayer) {
+		console.log('Player not found: ' + this.id);
+		return;
+	}
+	
+	// Update player position
+	movePlayer.setX(data.x);
+	movePlayer.setY(data.y);
+	movePlayer.setAngle(data.angle);
+
+	// Broadcast updated position to connected socket clients
+	this.broadcast.emit('movePlayer', {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), angle: movePlayer.getAngle()});
+}
+
+function playerById (id) {
+	var i;
+	for (i = 0; i < players.length; i++) {
+		if (players[i].id === id) {
+		  return players[i];
+		}
+	}
+
+	return false;
+}
 
 // Put a friendly message on the terminal
-console.log("Server running at http://127.0.0.1:31338/");
+console.log("Server running at http://127.0.0.1:31337/");
