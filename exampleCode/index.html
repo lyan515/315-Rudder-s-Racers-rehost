@@ -23,8 +23,10 @@ window.onload = function() {
     }
 
     var player;
+    var angle = 0;
     var cursors;
     var speed = 5;
+    var turnSpeed = 0.05;
 
     function create () {
 
@@ -49,42 +51,76 @@ window.onload = function() {
 
     }
 
+    function toDegrees (angle) {
+        return angle * (180 / Math.PI);
+    }
+
     function update() {
 
-        // using position
-        var xDir = 0;
+        // turning controls
+
+        if (cursors.up.isDown) {
+            player.x += (speed * Math.sin(angle));
+            player.y -= (speed * Math.cos(angle));
+        }
+        else if (cursors.down.isDown) {
+            player.x -= (speed * 0.5 * Math.sin(angle));
+            player.y += (speed * 0.5 * Math.cos(angle));
+        }
+
         if (cursors.left.isDown) {
-            // move left
-            player.body.x -= speed;
-            xDir = -1;
-            player.angle = -90;
+            if (cursors.down.isDown) {
+                angle -= turnSpeed * 0.5;
+            }
+            else if (cursors.up.isDown) {
+                angle -= turnSpeed;
+            }
+            player.angle = toDegrees(angle);
         }
         else if (cursors.right.isDown) {
-            // move right
-            player.x += speed;
-            xDir = 1;
-            player.angle = 90;
+            if (cursors.down.isDown) {
+                angle += turnSpeed * 0.5;
+            }
+            else if (cursors.up.isDown) {
+                angle += turnSpeed;
+            }
+            player.angle = toDegrees(angle);
         }
-        if (cursors.up.isDown) {
-            // move up
-            player.y -= speed;
-            if (xDir != 0) {
-                player.angle -= (45 * Math.sign(xDir));
-            }
-            else {
-                player.angle = 0;
-            }
-        }
-        if (cursors.down.isDown) {
-            // move down
-            player.y += speed;
-            if (xDir != 0) {
-                player.angle += (45 * Math.sign(xDir));
-            }
-            else {
-                player.angle = 180;
-            }
-        }
+
+        // using position
+        // var xDir = 0;
+        // if (cursors.left.isDown) {
+        //     // move left
+        //     player.x -= speed;
+        //     xDir = -1;
+        //     player.angle = -90;
+        // }
+        // else if (cursors.right.isDown) {
+        //     // move right
+        //     player.x += speed;
+        //     xDir = 1;
+        //     player.angle = 90;
+        // }
+        // if (cursors.up.isDown) {
+        //     // move up
+        //     player.y -= speed;
+        //     if (xDir != 0) {
+        //         player.angle -= (45 * Math.sign(xDir));
+        //     }
+        //     else {
+        //         player.angle = 0;
+        //     }
+        // }
+        // if (cursors.down.isDown) {
+        //     // move down
+        //     player.y += speed;
+        //     if (xDir != 0) {
+        //         player.angle += (45 * Math.sign(xDir));
+        //     }
+        //     else {
+        //         player.angle = 180;
+        //     }
+        // }
 
         // using velocity
         // // reset the player's velocity
