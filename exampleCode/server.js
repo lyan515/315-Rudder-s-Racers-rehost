@@ -85,10 +85,10 @@ socket.on('disconnect', function(socket) {
 	socket.broadcast.emit('updateCount', {c: connectionCount});
 });
 
-http.listen(31338, function(){
-  console.log('listening on *:31338'); //changed from 31337 for testing purposes
+http.listen(31400, function(){
+  console.log('listening on *:31400'); //changed from 31337 for testing purposes
 
 });
 
 // Put a friendly message on the terminal
-console.log("Server running at http://127.0.0.1:31338/");
+console.log("Server running at http://127.0.0.1:31400/");
