@@ -13,7 +13,7 @@
 
 window.onload = function() {
 
-    var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+    var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render });
 
     function preload () {
 
@@ -24,12 +24,14 @@ window.onload = function() {
 
     var player;
     var cursors;
-    var speed = 400;
+    var speed = 5;
 
     function create () {
 
         // enable Arcade Physics system
         game.physics.startSystem(Phaser.Physics.ARCADE);
+
+        game.world.setBounds(0, 0, 2000, 2000);
 
         // background logo
         var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
@@ -49,25 +51,25 @@ window.onload = function() {
 
     function update() {
 
-        // reset the player's velocity
-        player.body.velocity.x = 0;
-        player.body.velocity.y = 0;
-
+        // using position
+        var xDir = 0;
         if (cursors.left.isDown) {
             // move left
-            player.body.velocity.x = -speed;
+            player.body.x -= speed;
+            xDir = -1;
             player.angle = -90;
         }
         else if (cursors.right.isDown) {
             // move right
-            player.body.velocity.x = speed;
+            player.x += speed;
+            xDir = 1;
             player.angle = 90;
         }
         if (cursors.up.isDown) {
             // move up
-            player.body.velocity.y = -speed;
-            if (player.body.velocity.x != 0) {
-                player.angle -= (45 * Math.sign(player.body.velocity.x));
+            player.y -= speed;
+            if (xDir != 0) {
+                player.angle -= (45 * Math.sign(xDir));
             }
             else {
                 player.angle = 0;
@@ -75,16 +77,60 @@ window.onload = function() {
         }
         if (cursors.down.isDown) {
             // move down
-            player.body.velocity.y = speed;
-            if (player.body.velocity.x != 0) {
-                player.angle += (45 * Math.sign(player.body.velocity.x));
+            player.y += speed;
+            if (xDir != 0) {
+                player.angle += (45 * Math.sign(xDir));
             }
             else {
                 player.angle = 180;
             }
-        }    		
-    		
-    }	
+        }
+
+        // using velocity
+        // // reset the player's velocity
+        // player.body.velocity.x = 0;
+        // player.body.velocity.y = 0;
+
+        // if (cursors.left.isDown) {
+        //     // move left
+        //     player.body.velocity.x = -speed;
+        //     player.angle = -90;
+        // }
+        // else if (cursors.right.isDown) {
+        //     // move right
+        //     player.body.velocity.x = speed;
+        //     player.angle = 90;
+        // }
+        // if (cursors.up.isDown) {
+        //     // move up
+        //     player.body.velocity.y = -speed;
+        //     if (player.body.velocity.x != 0) {
+        //         player.angle -= (45 * Math.sign(player.body.velocity.x));
+        //     }
+        //     else {
+        //         player.angle = 0;
+        //     }
+        // }
+        // if (cursors.down.isDown) {
+        //     // move down
+        //     player.body.velocity.y = speed;
+        //     if (player.body.velocity.x != 0) {
+        //         player.angle += (45 * Math.sign(player.body.velocity.x));
+        //     }
+        //     else {
+        //         player.angle = 180;
+        //     }
+        // }
+
+        // update camera position
+        game.camera.focusOnXY(player.x, player.y)
+    }
+
+    function render() {
+
+        game.debug.cameraInfo(game.camera, 32, 32);
+
+    }
 
 }
 
