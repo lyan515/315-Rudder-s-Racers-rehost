@@ -64,7 +64,7 @@ var setEventHandlers = function (socket) {
   // Socket.IO
   socket.on('connection', onSocketConnection(socket));
   
-  socket.on('disconnect', onSocketDisconnect(socket))
+  socket.on('disconnect', onSocketDisconnect(socket));
 }
 
 socket.on('connection', function(socket) {
