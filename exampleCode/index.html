@@ -69,6 +69,12 @@ window.onload = function() {
     function toDegrees (angle) {
         return angle * (180 / Math.PI);
     }
+	
+	function speedup(){
+		if(speed < 700){
+			speed+= 5;
+		}
+	}
 
     function update() {
 
@@ -78,13 +84,18 @@ window.onload = function() {
         player.body.velocity.y = 0;
 
         if (cursors.up.isDown) {
+			speedup();
             player.body.velocity.x = (speed * Math.sin(angle));
             player.body.velocity.y = (-speed * Math.cos(angle));
         }
         else if (cursors.down.isDown) {
-            player.body.velocity.x = (-speed * 0.5 * Math.sin(angle));
+            speedup();
+			player.body.velocity.x = (-speed * 0.5 * Math.sin(angle));
             player.body.velocity.y = (speed * 0.5 * Math.cos(angle));
         }
+		else{
+			speed = 0;
+		}
 
         if (cursors.left.isDown) {
             if (cursors.down.isDown) {
@@ -110,6 +121,10 @@ window.onload = function() {
 
         // check for collisions
         var hitObstacle = game.physics.arcade.collide(player, obstacles);
+		
+		if(hitObstacle == true){
+			speed = 0;
+		}
     }
 
 }
