@@ -16,10 +16,18 @@ window.onload = function() {
 
 			game.load.image('logo', 'phaser.png');
 			game.load.image('bluebike', 'bluebike.png');
+			game.load.image('trashCan', 'trashCan.png');
 			create();
         }
 	
 		var player;
+
+		var angle = 0;
+    	var cursors;
+    	var speed = 400;
+    	var turnSpeed = 0.05;
+
+    	var obstacles;
 
         function create () {
 
@@ -28,17 +36,48 @@ window.onload = function() {
 				'reconnectionDelay': 1000,
 				'reconnectionDelayMax': 5000});
 				
-			var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
-            logo.anchor.setTo(0.5, 0.5);
-			player = game.add.sprite(game.world.centerX, game.world.centerY, 'bluebike');
-			player.anchor.setTo(0.5, 0.5);
-    	    player.scale.setTo(0.5, 0.5);
+			// enable Arcade Physics system
+	        game.physics.startSystem(Phaser.Physics.ARCADE);
+
+	        // set world size
+	        game.world.setBounds(0, 0, 2000, 2000);
+
+	        // background logo
+	        var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
+	        logo.anchor.setTo(0.5, 0.5);
+
+	        // player
+	        player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
+	        player.anchor.setTo(0.5, 0.5);
+		    player.scale.setTo(0.5, 0.5);
+	        // player.enableBody = true;
+	        game.physics.arcade.enable(player);
+	        player.body.collideWorldBounds = true;
+
+	        // set up obstacles
+	        obstacles = game.add.group();
+	        obstacles.enableBody = true;
+	        var staticObstacle = obstacles.create(600, 400, 'trashCan');
+	        staticObstacle.body.immovable = true;
+
+	        // controls
+	        cursors = game.input.keyboard.createCursorKeys();
 			
 			otherPlayers = [];
 			
 			setEventHandlers();
 			
         }
+
+        function toDegrees (angle) {
+        return angle * (180 / Math.PI);
+	    }
+		
+		function speedup(){
+			if(speed < 700){
+				speed+= 5;
+			}
+		}
 		
 		var setEventHandlers = function() {
 			socket.on('connect', onSocketConnected);
@@ -93,28 +132,53 @@ window.onload = function() {
 		}
 		
 		function update() {
+			// player movement
+	        // reset the player's velocity
+	        player.body.velocity.x = 0;
+	        player.body.velocity.y = 0;
 
-    	    if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT))
-    	    {
-				player.x -= 5;
-				player.angle = 270;
-    	    }
-    	    else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
-    	    {
-				player.x += 5;
-				player.angle = 90;
-    	    }
+	        if (cursors.up.isDown) {
+				speedup();
+	            player.body.velocity.x = (speed * Math.sin(angle));
+	            player.body.velocity.y = (-speed * Math.cos(angle));
+	        }
+	        else if (cursors.down.isDown) {
+	            speedup();
+				player.body.velocity.x = (-speed * 0.5 * Math.sin(angle));
+	            player.body.velocity.y = (speed * 0.5 * Math.cos(angle));
+	        }
+			else{
+				speed = 0;
+			}
 
-    	    if (game.input.keyboard.isDown(Phaser.Keyboard.UP))
-    	    {
-				player.y -= 5;
-				player.angle = 0;
-    	    }
-    	    else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN))
-    	    {
-				player.y += 5;
-				player.angle = 180;
-    	    }
+	        if (cursors.left.isDown) {
+	            if (cursors.down.isDown) {
+	                angle -= turnSpeed * 0.5;
+	            }
+	            else if (cursors.up.isDown) {
+	                angle -= turnSpeed;
+	            }
+	            player.angle = toDegrees(angle);
+	        }
+	        else if (cursors.right.isDown) {
+	            if (cursors.down.isDown) {
+	                angle += turnSpeed * 0.5;
+	            }
+	            else if (cursors.up.isDown) {
+	                angle += turnSpeed;
+	            }
+	            player.angle = toDegrees(angle);
+	        }
+
+	        // update camera position
+	        game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, 0.5, 0.5);
+
+	        // check for collisions
+	        var hitObstacle = game.physics.arcade.collide(player, obstacles);
+			
+			if(hitObstacle == true){
+				speed = 0;
+			}
 			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle });
 		}
 
