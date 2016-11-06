@@ -19,11 +19,11 @@ app.get('/*', function(request, response){
     console.log("Path: " + filePath);
     if (filePath == __dirname)
         filePath = __dirname + '/../public/index.html';
-	console.log("Path: " + filePath);
-	var extname = path.extname(filePath);
+    console.log("Path: " + filePath);
+    var extname = path.extname(filePath);
     var contentType = 'text/html';
-	
-	switch (extname) {
+    
+    switch (extname) {
         case '.js':
             contentType = 'text/javascript';
             break;
@@ -72,63 +72,63 @@ app.get('/*', function(request, response){
 var players;
 
 http.listen(31337, function(){
-	console.log('listening on *:31338'); //changed from 31337 for testing purposes
-	init();
+    console.log('listening on *:31338'); //changed from 31337 for testing purposes
+    init();
 });
 
 function init() {
-	players = [];
-	socket = io.listen(http);
-	
-	setEventHandlers();
+    players = [];
+    socket = io.listen(http);
+    
+    setEventHandlers();
 };
 
 var setEventHandlers = function() {
-	socket.sockets.on('connection', onSocketConnection);
+    socket.sockets.on('connection', onSocketConnection);
 };
 
 function onSocketConnection(client) {
-	console.log('Player connected');
-	
-	client.on('newPlayer', onNewPlayer);
-	client.on('movePlayer', onMovePlayer);
-	client.on('disconnect', onClientDisconnect);
-	
+    console.log('Player connected');
+    
+    client.on('newPlayer', onNewPlayer);
+    client.on('movePlayer', onMovePlayer);
+    client.on('disconnect', onClientDisconnect);
+    
 };
 
 function onNewPlayer(data) {
-	var newPlayer = new Player(data.x, data.y, data.angle);
-	newPlayer.id = this.id;
-	
-	this.emit('playerID', {id: newPlayer.id});
-	this.broadcast.emit('newPlayer', {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), angle: newPlayer.getAngle()});
-	
-	var i, existingPlayer;
-	for (i = 0; i < players.length; i++) {
-		existingPlayer = players[i]
-		this.emit('newPlayer', {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle()});
-	}
-	
-	players.push(newPlayer);
+    var newPlayer = new Player(data.x, data.y, data.angle);
+    newPlayer.id = this.id;
+    
+    this.emit('playerID', {id: newPlayer.id});
+    this.broadcast.emit('newPlayer', {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), angle: newPlayer.getAngle()});
+    
+    var i, existingPlayer;
+    for (i = 0; i < players.length; i++) {
+        existingPlayer = players[i]
+        this.emit('newPlayer', {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle()});
+    }
+    
+    players.push(newPlayer);
 }
 
 function onMovePlayer (data) {
-	// Find player in array
-	var movePlayer = playerById(this.id);
+    // Find player in array
+    var movePlayer = playerById(this.id);
 
-	// Player not found
-	if (!movePlayer) {
-		console.log('Player not found: ' + this.id);
-		return;
-	}
-	
-	// Update player position
-	movePlayer.setX(data.x);
-	movePlayer.setY(data.y);
-	movePlayer.setAngle(data.angle);
+    // Player not found
+    if (!movePlayer) {
+        console.log('Player not found: ' + this.id);
+        return;
+    }
+    
+    // Update player position
+    movePlayer.setX(data.x);
+    movePlayer.setY(data.y);
+    movePlayer.setAngle(data.angle);
 
-	// Broadcast updated position to connected socket clients
-	this.broadcast.emit('movePlayer', {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), angle: movePlayer.getAngle()});
+    // Broadcast updated position to connected socket clients
+    this.broadcast.emit('movePlayer', {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), angle: movePlayer.getAngle()});
 }
 
 function onClientDisconnect () {
@@ -150,14 +150,14 @@ function onClientDisconnect () {
 }
 
 function playerById (id) {
-	var i;
-	for (i = 0; i < players.length; i++) {
-		if (players[i].id === id) {
-		  return players[i];
-		}
-	}
+    var i;
+    for (i = 0; i < players.length; i++) {
+        if (players[i].id === id) {
+          return players[i];
+        }
+    }
 
-	return false;
+    return false;
 }
 
 // Put a friendly message on the terminal

@@ -7,7 +7,7 @@ window.onload = function() {
         //  Although it will work fine with this tutorial, it's almost certainly not the most current version.
         //  Be sure to replace it with an updated version before you start experimenting with adding your own code.
 
-        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+        var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 		var socket;
 		var otherPlayers;
@@ -17,6 +17,11 @@ window.onload = function() {
 			game.load.image('logo', 'phaser.png');
 			game.load.image('bluebike', 'bluebike.png');
 			game.load.image('trashCan', 'trashCan.png');
+			// total map size: 7680 x 6694
+			game.load.image('mapTL', 'campusCircuit_TL.png');
+			game.load.image('mapTR', 'campusCircuit_TR.png');
+			game.load.image('mapBL', 'campusCircuit_BL.png');
+			game.load.image('mapBR', 'campusCircuit_BR.png');
 			create();
         }
 	
@@ -40,16 +45,28 @@ window.onload = function() {
 	        game.physics.startSystem(Phaser.Physics.ARCADE);
 
 	        // set world size
-	        game.world.setBounds(0, 0, 2000, 2000);
+	        game.world.setBounds(0, 0, 23040, 20082);
 
-	        // background logo
-	        var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
-	        logo.anchor.setTo(0.5, 0.5);
+	        // background (map)
+	        var map = game.add.sprite(0, 0, 'mapTL');
+	        map.anchor.setTo(0, 0);
+	        map.scale.setTo(3, 3);
+	        map = game.add.sprite(game.world.width / 2, 0, 'mapTR');
+	        map.anchor.setTo(0, 0);
+	        map.scale.setTo(3, 3);
+	        map = game.add.sprite(0, game.world.height / 2, 'mapBL');
+	        map.anchor.setTo(0, 0);
+	        map.scale.setTo(3, 3);
+	        map = game.add.sprite(game.world.width / 2, game.world.height / 2, 'mapBR');
+	        map.anchor.setTo(0, 0);
+	        map.scale.setTo(3, 3);
 
 	        // player
 	        player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
 	        player.anchor.setTo(0.5, 0.5);
 		    player.scale.setTo(0.5, 0.5);
+		    player.x =  3000;
+		    player.y = 16150;
 	        // player.enableBody = true;
 	        game.physics.arcade.enable(player);
 	        player.body.collideWorldBounds = true;
@@ -59,6 +76,10 @@ window.onload = function() {
 	        obstacles.enableBody = true;
 	        var staticObstacle = obstacles.create(600, 400, 'trashCan');
 	        staticObstacle.body.immovable = true;
+
+	        // set up camera size
+	        game.camera.width = 1280;
+	        game.camera.height = 720;
 
 	        // controls
 	        cursors = game.input.keyboard.createCursorKeys();
@@ -70,7 +91,7 @@ window.onload = function() {
         }
 
         function toDegrees (angle) {
-        return angle * (180 / Math.PI);
+        	return angle * (180 / Math.PI);
 	    }
 		
 		function speedup(){
