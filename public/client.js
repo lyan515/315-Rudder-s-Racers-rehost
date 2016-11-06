@@ -22,6 +22,7 @@ window.onload = function() {
 			game.load.image('mapTR', 'campusCircuit_TR.png');
 			game.load.image('mapBL', 'campusCircuit_BL.png');
 			game.load.image('mapBR', 'campusCircuit_BR.png');
+			game.load.image('finish', 'finishline.png');
 			create();
         }
 	
@@ -35,7 +36,6 @@ window.onload = function() {
     	var obstacles;
 
         function create () {
-
             socket = io.connect({
 				'reconnection': true,
 				'reconnectionDelay': 1000,
@@ -60,6 +60,9 @@ window.onload = function() {
 	        map = game.add.sprite(game.world.width / 2, game.world.height / 2, 'mapBR');
 	        map.anchor.setTo(0, 0);
 	        map.scale.setTo(3, 3);
+			
+			//finish line
+			//map = game.add.sprite(250, 250, 'finish');
 
 	        // player
 	        player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
@@ -149,13 +152,14 @@ window.onload = function() {
 			movePlayer.player.x = data.x;
 			movePlayer.player.y = data.y;
 			movePlayer.player.angle = data.angle;
+			game.debug.text("Player Number: "+ player.id, 32, 32);
 
 		}
 		
 		function update() {
 			// player movement
 	        // reset the player's velocity
-	        player.body.velocity.x = 0;
+			player.body.velocity.x = 0;
 	        player.body.velocity.y = 0;
 
 	        if (cursors.up.isDown) {
