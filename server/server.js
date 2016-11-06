@@ -15,10 +15,14 @@ app.use(express.static('public'));
 app.get('/*', function(request, response){
     console.log('request starting...');
 
-    var filePath = __dirname + '/..' +request.url;
+    var filePath = __dirname;
+    console.log("request.url: " + request.url);
     console.log("Path: " + filePath);
-    if (filePath == __dirname)
+    console.log("__dirname: " + __dirname);
+    if (filePath == __dirname) {
+        console.log("Path was directory name");
         filePath = __dirname + '/../public/index.html';
+    }
 	console.log("Path: " + filePath);
 	var extname = path.extname(filePath);
     var contentType = 'text/html';
@@ -71,7 +75,7 @@ app.get('/*', function(request, response){
 
 var players;
 
-http.listen(31337, function(){
+http.listen(31338, function(){
 	console.log('listening on *:31338'); //changed from 31337 for testing purposes
 	init();
 });
@@ -161,4 +165,4 @@ function playerById (id) {
 }
 
 // Put a friendly message on the terminal
-console.log("Server running at http://127.0.0.1:31337/");
+console.log("Server running at http://127.0.0.1:31338/");
