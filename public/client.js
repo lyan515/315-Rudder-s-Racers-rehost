@@ -3,7 +3,7 @@ var count;
 
 window.onload = function() {
 
-        var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+        var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update});
 
 		var socket;
 		var otherPlayers;
@@ -41,34 +41,114 @@ window.onload = function() {
 				'reconnectionDelayMax': 5000});
 			setEventHandlers();
         }
-	
-        function create () {				
-			// enable Arcade Physics system
-	        game.physics.startSystem(Phaser.Physics.ARCADE);
-
-	        // set world size
-	        game.world.setBounds(0, 0, 23040, 20082);
-
-	        // background (map)
-	        var map = game.add.sprite(0, 0, 'mapTL');
-	        map.anchor.setTo(0, 0);
-	        map.scale.setTo(3, 3);
-	        map = game.add.sprite(game.world.width / 2, 0, 'mapTR');
-	        map.anchor.setTo(0, 0);
-	        map.scale.setTo(3, 3);
-	        map = game.add.sprite(0, game.world.height / 2, 'mapBL');
-	        map.anchor.setTo(0, 0);
-	        map.scale.setTo(3, 3);
-	        map = game.add.sprite(game.world.width / 2, game.world.height / 2, 'mapBR');
-	        map.anchor.setTo(0, 0);
-	        map.scale.setTo(3, 3);
-			
-			//finish line
-			finish = game.add.sprite(3100, 16065, 'finish');
-			finish.scale.setTo(0.25, .75);
-
-	        // add arrows
-	        var arrow = game.add.sprite(2856, 16022, 'arrow');
+		
+		function createObs(){
+			obstacles = game.add.group();
+			obstacles.enableBody = true;
+			var staticObstacle1 = obstacles.create(3072, 15052, 'trashCan');
+			staticObstacle1.anchor.setTo(0.5, 0.5);
+			staticObstacle1.body.immovable = true;
+			var staticObstacle2 = obstacles.create(2972, 13425, 'trashCan');
+			staticObstacle2.anchor.setTo(0.5, 0.5);
+			staticObstacle2.body.immovable = true;
+			var staticObstacle3 = obstacles.create(3022, 11101, 'trashCan');
+			staticObstacle3.anchor.setTo(0.5, 0.5);
+			staticObstacle3.body.immovable = true;
+			var staticObstacle4 = obstacles.create(2970, 8763, 'trashCan');
+			staticObstacle4.anchor.setTo(0.5, 0.5);
+			staticObstacle4.body.immovable = true;
+			var staticObstacle5 = obstacles.create(2932, 6462, 'trashCan');
+			staticObstacle5.anchor.setTo(0.5, 0.5);
+			staticObstacle5.body.immovable = true;
+			var staticObstacle5 = obstacles.create(3013, 3007, 'trashCan');
+			staticObstacle5.anchor.setTo(0.5, 0.5);
+			staticObstacle5.body.immovable = true;
+			var staticObstacle6 = obstacles.create(2903, 2974, 'trashCan');
+			staticObstacle6.anchor.setTo(0.5, 0.5);
+			staticObstacle6.body.immovable = true;
+			var staticObstacle7 = obstacles.create(3673, 1382, 'trashCan');
+			staticObstacle7.anchor.setTo(0.5, 0.5);
+			staticObstacle7.body.immovable = true;
+			var staticObstacle7 = obstacles.create(3673, 1335, 'trashCan');
+			staticObstacle7.anchor.setTo(0.5, 0.5);
+			staticObstacle7.body.immovable = true;
+			var staticObstacle7 = obstacles.create(3673, 1450, 'trashCan');
+			staticObstacle7.anchor.setTo(0.5, 0.5);
+			staticObstacle7.body.immovable = true;
+			var staticObstacle8 = obstacles.create(4996, 1451, 'trashCan');
+			staticObstacle8.anchor.setTo(0.5, 0.5);
+			staticObstacle8.body.immovable = true;
+			var staticObstacle9 = obstacles.create(6469, 1377, 'trashCan');
+			staticObstacle9.anchor.setTo(0.5, 0.5);
+			staticObstacle9.body.immovable = true;
+			var staticObstacle10 = obstacles.create(7324, 1513, 'trashCan');
+			staticObstacle10.anchor.setTo(0.5, 0.5);
+			staticObstacle10.body.immovable = true;
+			var staticObstacle11 = obstacles.create(7324, 1434, 'trashCan');
+			staticObstacle11.anchor.setTo(0.5, 0.5);
+			staticObstacle11.body.immovable = true;
+			var staticObstacle12 = obstacles.create(9517, 1573, 'trashCan');
+			staticObstacle12.anchor.setTo(0.5, 0.5);
+			staticObstacle12.body.immovable = true;
+			var staticObstacle13 = obstacles.create(9479, 1473, 'trashCan');
+			staticObstacle13.anchor.setTo(0.5, 0.5);
+			staticObstacle13.body.immovable = true;
+			var staticObstacle14 = obstacles.create(12853, 1535, 'trashCan');
+			staticObstacle14.anchor.setTo(0.5, 0.5);
+			staticObstacle14.body.immovable = true;
+			var staticObstacle15 = obstacles.create(12853, 1463, 'trashCan');
+			staticObstacle15.anchor.setTo(0.5, 0.5);
+			staticObstacle15.body.immovable = true;
+			var staticObstacle16 = obstacles.create(19820, 1599, 'trashCan');
+			staticObstacle16.anchor.setTo(0.5, 0.5);
+			staticObstacle16.body.immovable = true;
+			var staticObstacle17 = obstacles.create(16500, 1463, 'trashCan');
+			staticObstacle17.anchor.setTo(0.5, 0.5);
+			staticObstacle17.body.immovable = true;
+			var staticObstacle18 = obstacles.create(20044, 3986, 'trashCan');
+			staticObstacle18.anchor.setTo(0.5, 0.5);
+			staticObstacle18.body.immovable = true;
+			var staticObstacle19 = obstacles.create(15171, 9436, 'trashCan');
+			staticObstacle19.anchor.setTo(0.5, 0.5);
+			staticObstacle19.body.immovable = true;
+			var staticObstacle20 = obstacles.create(15171, 9436, 'trashCan');
+			staticObstacle20.anchor.setTo(0.5, 0.5);
+			staticObstacle20.body.immovable = true;
+			var staticObstacle20 = obstacles.create(15171, 9436, 'trashCan');
+			staticObstacle20.anchor.setTo(0.5, 0.5);
+			staticObstacle20.body.immovable = true;
+			var staticObstacle21 = obstacles.create(19176, 9866, 'trashCan');
+			staticObstacle21.anchor.setTo(0.5, 0.5);
+			staticObstacle21.body.immovable = true;
+			var staticObstacle22 = obstacles.create(19176, 9866, 'trashCan');
+			staticObstacle22.anchor.setTo(0.5, 0.5);
+			staticObstacle22.body.immovable = true;
+			staticObstacle22.scale.setTo(5,5);
+			var staticObstacle23 = obstacles.create(19493, 7349, 'trashCan');
+			staticObstacle23.anchor.setTo(0.5, 0.5);
+			staticObstacle23.body.immovable = true;
+			staticObstacle23.scale.setTo(5,5);
+			var staticObstacle24 = obstacles.create(18410, 10766, 'trashCan');
+			staticObstacle24.anchor.setTo(0.5, 0.5);
+			staticObstacle24.body.immovable = true;
+			staticObstacle24.scale.setTo(5,5);
+			var staticObstacle25 = obstacles.create(13696, 10830, 'trashCan');
+			staticObstacle25.anchor.setTo(0.5, 0.5);
+			staticObstacle25.body.immovable = true;
+			staticObstacle25.scale.setTo(10,10);
+			var staticObstacle26 = obstacles.create(12992, 14569, 'trashCan');
+			staticObstacle26.anchor.setTo(0.5, 0.5);
+			staticObstacle26.body.immovable = true;
+			var staticObstacle27 = obstacles.create(12826, 18547, 'trashCan');
+			staticObstacle27.anchor.setTo(0.5, 0.5);
+			staticObstacle27.body.immovable = true;
+			var staticObstacle27 = obstacles.create(4502, 16125, 'trashCan');
+			staticObstacle27.anchor.setTo(0.5, 0.5);
+			staticObstacle27.body.immovable = true;
+		}
+		
+		function createArrows(){
+			var arrow = game.add.sprite(2856, 16022, 'arrow');
 	        arrow.anchor.setTo(0.5, 0.5);
 	        arrow.scale.setTo(0.1, 0.1);
 	        arrow.angle = -90;
@@ -192,6 +272,35 @@ window.onload = function() {
 	        arrow.anchor.setTo(0.5, 0.5);
 	        arrow.scale.setTo(0.1, 0.1);
 	        arrow.angle = 180;
+		}
+	
+        function create () {				
+			// enable Arcade Physics system
+	        game.physics.startSystem(Phaser.Physics.ARCADE);
+
+	        // set world size
+	        game.world.setBounds(0, 0, 23040, 20082);
+
+	        // background (map)
+	        var map = game.add.sprite(0, 0, 'mapTL');
+	        map.anchor.setTo(0, 0);
+	        map.scale.setTo(3, 3);
+	        map = game.add.sprite(game.world.width / 2, 0, 'mapTR');
+	        map.anchor.setTo(0, 0);
+	        map.scale.setTo(3, 3);
+	        map = game.add.sprite(0, game.world.height / 2, 'mapBL');
+	        map.anchor.setTo(0, 0);
+	        map.scale.setTo(3, 3);
+	        map = game.add.sprite(game.world.width / 2, game.world.height / 2, 'mapBR');
+	        map.anchor.setTo(0, 0);
+	        map.scale.setTo(3, 3);
+			
+			//finish line
+			finish = game.add.sprite(3100, 16065, 'finish');
+			finish.scale.setTo(0.25, .75);
+
+	        // add arrows
+	        createArrows();
 
 	        // player
 	        player = game.add.sprite(2900, 16150, 'bluebike');
@@ -202,7 +311,8 @@ window.onload = function() {
 	        player.body.collideWorldBounds = true;
 
 	        // set up obstacles
-
+			createObs();
+			
 	        // set up camera size
 	        game.camera.width = 1280;
 	        game.camera.height = 720;
@@ -362,7 +472,7 @@ window.onload = function() {
 			if (checkOverlap(player, finish)&& cooldown < 0)
 			{
 				player.laps++;
-				cooldown = 100;//resets cooldown to prevent multiple lap increments
+				cooldown = 2400;//resets cooldown to prevent multiple lap increments
 				if(player.laps >= 3){
 					socket.emit('gameWin', { id:player.id});
 					endText.setText("You Win!")
@@ -372,8 +482,8 @@ window.onload = function() {
 			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
 	
 	        // check for collisions
-	        var hitObstacle = game.physics.arcade.collide(player, obstacles);
-			//var hitObstacle = game.physics.arcade.collide(player, obstacles);
+	        //var hitArrows = game.physics.arcade.collide(player, arrow);
+			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			
 			if(hitObstacle == true){
 				speed = 0;
