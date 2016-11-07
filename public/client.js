@@ -11,7 +11,11 @@ window.onload = function() {
 
 		var angle = 0;
     	var cursors;
-    	var speed = 400;
+    	var speed = 0;
+    	var maxSpeed = 700;
+    	var acceleration = 5;
+    	var braking = 15;
+    	var reversing = false;
     	var turnSpeed = 0.05;
 		var cooldown = 0;
 		var endText;
@@ -68,130 +72,132 @@ window.onload = function() {
 			finish.scale.setTo(0.25, .75);
 
 	        // add arrows
-	        var arrow = game.add.sprite(2856, 16022, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = -90;
-	        arrow = game.add.sprite(2878, 13332, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = -90;
-	        arrow = game.add.sprite(2789, 8872, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = -90;
-	        arrow = game.add.sprite(2896, 4725, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = -90;
-	        arrow = game.add.sprite(2896, 1316, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow = game.add.sprite(8869, 1316, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow = game.add.sprite(12192, 1316, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow = game.add.sprite(18124, 1316, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow = game.add.sprite(20113, 1440, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 90;
-	        arrow = game.add.sprite(19721, 5366, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 90;
-	        arrow = game.add.sprite(20053, 7105, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 135;
-	        arrow = game.add.sprite(19055, 7962, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 90;
-	        arrow = game.add.sprite(19093, 8894, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 90;
-	        arrow = game.add.sprite(19429, 8894, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 90;
-	        arrow = game.add.sprite(19188, 10409, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 135;
-	        arrow = game.add.sprite(18498, 11000, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 180;
-	        arrow = game.add.sprite(17242, 10245, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 135;
-	        arrow = game.add.sprite(16449, 11225, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 180;
-	        arrow = game.add.sprite(16449, 10428, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 180;
-	        arrow = game.add.sprite(15552, 11225, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 180;
-	        arrow = game.add.sprite(15552, 10428, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 180;
-	        arrow = game.add.sprite(14344, 11225, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 180;
-	        arrow = game.add.sprite(14244, 10428, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 180;
-	        arrow = game.add.sprite(13357, 10517, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 135;
-	        arrow = game.add.sprite(12772, 10821, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 90;
-	        arrow = game.add.sprite(13251, 13685, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 90;
-	        arrow = game.add.sprite(13235, 16722, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 90;
-	        arrow = game.add.sprite(13020, 18800, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 180;
-	        arrow = game.add.sprite(9628, 18800, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 180;
-	        arrow = game.add.sprite(8520, 18668, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = -90;
-	        arrow = game.add.sprite(8770, 16183, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = -135;
-	        arrow = game.add.sprite(5654, 16263, 'arrow');
-	        arrow.anchor.setTo(0.5, 0.5);
-	        arrow.scale.setTo(0.1, 0.1);
-	        arrow.angle = 180;
+	        {
+		        var arrow = game.add.sprite(2856, 16022, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = -90;
+		        arrow = game.add.sprite(2878, 13332, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = -90;
+		        arrow = game.add.sprite(2789, 8872, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = -90;
+		        arrow = game.add.sprite(2896, 4725, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = -90;
+		        arrow = game.add.sprite(2896, 1316, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow = game.add.sprite(8869, 1316, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow = game.add.sprite(12192, 1316, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow = game.add.sprite(18124, 1316, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow = game.add.sprite(20113, 1440, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 90;
+		        arrow = game.add.sprite(19721, 5366, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 90;
+		        arrow = game.add.sprite(20053, 7105, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 135;
+		        arrow = game.add.sprite(19055, 7962, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 90;
+		        arrow = game.add.sprite(19093, 8894, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 90;
+		        arrow = game.add.sprite(19429, 8894, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 90;
+		        arrow = game.add.sprite(19188, 10409, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 135;
+		        arrow = game.add.sprite(18498, 11000, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 180;
+		        arrow = game.add.sprite(17242, 10245, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 135;
+		        arrow = game.add.sprite(16449, 11225, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 180;
+		        arrow = game.add.sprite(16449, 10428, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 180;
+		        arrow = game.add.sprite(15552, 11225, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 180;
+		        arrow = game.add.sprite(15552, 10428, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 180;
+		        arrow = game.add.sprite(14344, 11225, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 180;
+		        arrow = game.add.sprite(14244, 10428, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 180;
+		        arrow = game.add.sprite(13357, 10517, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 135;
+		        arrow = game.add.sprite(12772, 10821, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 90;
+		        arrow = game.add.sprite(13251, 13685, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 90;
+		        arrow = game.add.sprite(13235, 16722, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 90;
+		        arrow = game.add.sprite(13020, 18800, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 180;
+		        arrow = game.add.sprite(9628, 18800, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 180;
+		        arrow = game.add.sprite(8520, 18668, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = -90;
+		        arrow = game.add.sprite(8770, 16183, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = -135;
+		        arrow = game.add.sprite(5654, 16263, 'arrow');
+		        arrow.anchor.setTo(0.5, 0.5);
+		        arrow.scale.setTo(0.1, 0.1);
+		        arrow.angle = 180;
+	    	}
 
 	        // player
 	        player = game.add.sprite(2900, 16150, 'bluebike');
@@ -224,9 +230,41 @@ window.onload = function() {
         	return angle * (180 / Math.PI);
 	    }
 		
-		function speedup(){		//acceleration function
-			if(speed < 700){	//max speed
-				speed+= 5;
+		function forward() {		//forward function
+			if (speed < 0) {		// if going backwards, brake and move forward
+				speed += (acceleration + braking);
+			}
+			else if(speed < maxSpeed){	//max speed
+				speed += acceleration;
+			}
+			if (speed > maxSpeed) {
+				speed = maxSpeed;
+			}
+		}
+
+		function reverse() {	//reverse function
+			if (speed > 0) {		// if going forward, brake and reverse
+				speed -= (acceleration + braking);
+			}
+			else if(speed > (-maxSpeed / 2)) {	// min speed
+				speed -= acceleration;
+			}
+			else if (speed < (-maxSpeed / 2)) {
+				speed = -maxSpeed / 2;
+			}
+		}
+
+		function decelerate() {
+			if (speed > 0) {
+				speed -= braking;
+			}
+			else if (speed < 0) {
+				speed += braking;
+				reversing = true;
+			}
+			if ((speed < 0 && !reversing) || (speed > 0 && reversing)) {
+				speed = 0;
+				reversing = false;
 			}
 		}
 		
@@ -317,22 +355,26 @@ window.onload = function() {
 		function update() {
 			// player movement
 	        // reset the player's velocity
-			player.body.velocity.x = 0;
-	        player.body.velocity.y = 0;
+			//player.body.velocity.x = 0;
+	        //player.body.velocity.y = 0;
 
 	        if (cursors.up.isDown) {	//forward and backward movement
-				speedup();
+				forward();
+				reversing = false;
 	            player.body.velocity.x = (speed * Math.sin(angle));
 	            player.body.velocity.y = (-speed * Math.cos(angle));
 	        }
 	        else if (cursors.down.isDown) {
-	            speedup();
-				player.body.velocity.x = (-speed * 0.5 * Math.sin(angle));
-	            player.body.velocity.y = (speed * 0.5 * Math.cos(angle));
+	            reverse();
+	            reversing = true;
+				player.body.velocity.x = (speed * Math.sin(angle));
+	            player.body.velocity.y = (-speed * Math.cos(angle));
 	        }
-			else{
-				speed = 0;
-			}
+	        else {
+	        	decelerate();
+	        	player.body.velocity.x = (speed * Math.sin(angle));
+	        	player.body.velocity.y = (-speed * Math.cos(angle));
+	        }
 
 	        if (cursors.left.isDown) {			//left and right angled movement
 	            if (cursors.down.isDown) {		//two buttons pressed simultaneously 
