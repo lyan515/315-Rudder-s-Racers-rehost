@@ -1,6 +1,3 @@
-var count;
-// var socket;
-
 window.onload = function() {
 
         var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update});
@@ -11,7 +8,11 @@ window.onload = function() {
 
 		var angle = 0;
     	var cursors;
-    	var speed = 400;
+    	var speed = 0;
+    	var maxSpeed = 700;
+    	var acceleration = 5;
+    	var braking = 15;
+    	var reversing = false;
     	var turnSpeed = 0.05;
 		var cooldown = 0;
 		var endText;
@@ -41,7 +42,7 @@ window.onload = function() {
 				'reconnectionDelayMax': 5000});
 			setEventHandlers();
         }
-		
+
 		function createObs(){
 			obstacles = game.add.group();
 			obstacles.enableBody = true;
@@ -273,6 +274,7 @@ window.onload = function() {
 	        arrow.scale.setTo(0.1, 0.1);
 	        arrow.angle = 180;
 		}
+
 	
         function create () {				
 			// enable Arcade Physics system
@@ -300,6 +302,7 @@ window.onload = function() {
 			finish.scale.setTo(0.25, .75);
 
 	        // add arrows
+
 	        createArrows();
 
 	        // player
@@ -334,9 +337,41 @@ window.onload = function() {
         	return angle * (180 / Math.PI);
 	    }
 		
-		function speedup(){		//acceleration function
-			if(speed < 700){	//max speed
-				speed+= 5;
+		function forward() {		//forward function
+			if (speed < 0) {		// if going backwards, brake and move forward
+				speed += (acceleration + braking);
+			}
+			else if(speed < maxSpeed){	//max speed
+				speed += acceleration;
+			}
+			if (speed > maxSpeed) {
+				speed = maxSpeed;
+			}
+		}
+
+		function reverse() {	//reverse function
+			if (speed > 0) {		// if going forward, brake and reverse
+				speed -= (acceleration + braking);
+			}
+			else if(speed > (-maxSpeed / 2)) {	// min speed
+				speed -= acceleration;
+			}
+			else if (speed < (-maxSpeed / 2)) {
+				speed = -maxSpeed / 2;
+			}
+		}
+
+		function decelerate() {
+			if (speed > 0) {
+				speed -= braking;
+			}
+			else if (speed < 0) {
+				speed += braking;
+				reversing = true;
+			}
+			if ((speed < 0 && !reversing) || (speed > 0 && reversing)) {
+				speed = 0;
+				reversing = false;
 			}
 		}
 		
@@ -427,22 +462,26 @@ window.onload = function() {
 		function update() {
 			// player movement
 	        // reset the player's velocity
-			player.body.velocity.x = 0;
-	        player.body.velocity.y = 0;
+			//player.body.velocity.x = 0;
+	        //player.body.velocity.y = 0;
 
 	        if (cursors.up.isDown) {	//forward and backward movement
-				speedup();
+				forward();
+				reversing = false;
 	            player.body.velocity.x = (speed * Math.sin(angle));
 	            player.body.velocity.y = (-speed * Math.cos(angle));
 	        }
 	        else if (cursors.down.isDown) {
-	            speedup();
-				player.body.velocity.x = (-speed * 0.5 * Math.sin(angle));
-	            player.body.velocity.y = (speed * 0.5 * Math.cos(angle));
+	            reverse();
+	            reversing = true;
+				player.body.velocity.x = (speed * Math.sin(angle));
+	            player.body.velocity.y = (-speed * Math.cos(angle));
 	        }
-			else{
-				speed = 0;
-			}
+	        else {
+	        	decelerate();
+	        	player.body.velocity.x = (speed * Math.sin(angle));
+	        	player.body.velocity.y = (-speed * Math.cos(angle));
+	        }
 
 	        if (cursors.left.isDown) {			//left and right angled movement
 	            if (cursors.down.isDown) {		//two buttons pressed simultaneously 
