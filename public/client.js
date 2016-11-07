@@ -54,12 +54,7 @@ window.onload = function() {
 
     	var obstacles;
 
-        function create () {
-            socket = io.connect({
-				'reconnection': true,
-				'reconnectionDelay': 1000,
-				'reconnectionDelayMax': 5000});
-				
+        function create () {				
 			// enable Arcade Physics system
 	        game.physics.startSystem(Phaser.Physics.ARCADE);
 
