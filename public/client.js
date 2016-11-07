@@ -54,18 +54,18 @@ window.onload = function() {
 	        game.world.setBounds(0, 0, 23040, 20082);
 
 	        // background (map)
-	        var map = game.add.sprite(0, 0, 'mapTL');
-	        map.anchor.setTo(0, 0);
-	        map.scale.setTo(3, 3);
-	        map = game.add.sprite(game.world.width / 2, 0, 'mapTR');
-	        map.anchor.setTo(0, 0);
-	        map.scale.setTo(3, 3);
-	        map = game.add.sprite(0, game.world.height / 2, 'mapBL');
-	        map.anchor.setTo(0, 0);
-	        map.scale.setTo(3, 3);
-	        map = game.add.sprite(game.world.width / 2, game.world.height / 2, 'mapBR');
-	        map.anchor.setTo(0, 0);
-	        map.scale.setTo(3, 3);
+	        var mapTL = game.add.sprite(0, 0, 'mapTL');
+	        mapTL.anchor.setTo(0, 0);
+	        mapTL.scale.setTo(3, 3);
+	        var mapTR = game.add.sprite(game.world.width / 2, 0, 'mapTR');
+	        mapTR.anchor.setTo(0, 0);
+	        mapTR.scale.setTo(3, 3);
+	        var mapBL = game.add.sprite(0, game.world.height / 2, 'mapBL');
+	        mapBL.anchor.setTo(0, 0);
+	        mapBL.scale.setTo(3, 3);
+	        var mapBR = game.add.sprite(game.world.width / 2, game.world.height / 2, 'mapBR');
+	        mapBR.anchor.setTo(0, 0);
+	        mapBR.scale.setTo(3, 3);
 			
 			//finish line
 			finish = game.add.sprite(3100, 16065, 'finish');
@@ -334,8 +334,6 @@ window.onload = function() {
 			movePlayer.player.y = data.y;
 			movePlayer.player.angle = data.angle;
 			movePlayer.player.laps = data.laps;
-			
-
 		}
 		
 		function onGameFinish (data) {
