@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var socket = require('socket.io')(http);
 
 var Player = require('./player')
 
@@ -9,6 +9,8 @@ var fs = require('fs');
 var path = require('path');
 
 var connectionCount = 0;
+
+var PORT = 31337;
 
 app.use(express.static('public'));
 
@@ -71,14 +73,14 @@ app.get('/*', function(request, response){
 
 var players;
 
-http.listen(31337, function(){
-    console.log('listening on *:31338'); //changed from 31337 for testing purposes
+http.listen(PORT, function(){
+    console.log('listening on *:'+PORT); //changed from 31337 for testing purposes
     init();
 });
 
 function init() {
     players = [];
-    socket = io.listen(http);
+    socket.listen(http);
     
     setEventHandlers();
 };
@@ -88,8 +90,6 @@ var setEventHandlers = function() {
 };
 
 function onSocketConnection(client) {
-    console.log('Player connected');
-    
     client.on('newPlayer', onNewPlayer);
     client.on('movePlayer', onMovePlayer);
     client.on('disconnect', onClientDisconnect);
@@ -97,16 +97,18 @@ function onSocketConnection(client) {
 };
 
 function onNewPlayer(data) {
+	console.log('Player connected: ' + this.id);
     var newPlayer = new Player(data.x, data.y, data.angle);
     newPlayer.id = this.id;
+	newPlayer.playerNum = players.length;
     
-    this.emit('playerID', {id: newPlayer.id});
-    this.broadcast.emit('newPlayer', {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), angle: newPlayer.getAngle()});
+    this.emit('playerID', {id: newPlayer.id, playerNum: newPlayer.playerNum});
+    this.broadcast.emit('newPlayer', {id: newPlayer.id, playerNum: newPlayer.playerNum, x: newPlayer.getX(), y: newPlayer.getY(), angle: newPlayer.getAngle()});
     
     var i, existingPlayer;
     for (i = 0; i < players.length; i++) {
         existingPlayer = players[i]
-        this.emit('newPlayer', {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle()});
+        this.emit('newPlayer', {id: existingPlayer.id, playerNum: newPlayer.playerNum, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle()});
     }
     
     players.push(newPlayer);
@@ -161,4 +163,4 @@ function playerById (id) {
 }
 
 // Put a friendly message on the terminal
-console.log("Server running at http://127.0.0.1:31337/");
+console.log("Server running at http://127.0.0.1:" + PORT);

@@ -1,14 +1,16 @@
-var OtherPlayer = function(id, game, player, startX, startY, startAngle) {
+var OtherPlayer = function(id, game, player, playerNum, startX, startY, startAngle) {
 	var x = startX;
 	var y = startY;
 	var angle = startAngle;
+	
 	//game.load.image('bluebike', 'bluebike.png');
 
 	this.game = game;
 	this.player = player;
 	
-	this.player = game.add.sprite(x, y, 'bluebike');
+	this.player = game.add.sprite(x+playerNum*35, y+playerNum, 'bluebike');
 	this.player.id = id.toString();
+	
 
 	this.player.anchor.setTo(0.5, 0.5);
 	this.player.scale.setTo(0.5, 0.5);
