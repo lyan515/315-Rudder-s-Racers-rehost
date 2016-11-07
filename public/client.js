@@ -18,6 +18,7 @@ window.onload = function() {
     	var speed = 400;
     	var turnSpeed = 0.05;
 		var cooldown = 0;
+		var endText;
 
     	var obstacles;
 		function preload () {
@@ -90,6 +91,14 @@ window.onload = function() {
 
 	        // controls
 	        cursors = game.input.keyboard.createCursorKeys();
+			
+			//endText
+			endText = game.add.text(player.x, player.y, "", {
+						font: "65px Arial",
+						fill: "#ff0044",
+						align: "center"
+			});
+			endText.anchor.setTo(0.5, 0.5);
 
         }
 
@@ -116,6 +125,7 @@ window.onload = function() {
 				player.playerNum = data.playerNum;
 				player.x += (player.playerNum*35); 
 			});
+			socket.on('gameFinish', onGameFinish);
 		}
 		
 		function onSocketConnected() {
@@ -162,6 +172,11 @@ window.onload = function() {
 			movePlayer.player.laps = data.laps;
 			
 
+		}
+		
+		function onGameFinish (data) {
+			endText.setText("You Lose!");
+			endText.anchor.setTo(0.5, 0.5);
 		}
 		
 		function checkOverlap(spriteA, spriteB) {
@@ -214,19 +229,25 @@ window.onload = function() {
 
 	        // update camera position
 	        game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, 0.5, 0.5);
+			endText.x = player.x;
+			endText.y = player.y;
 			
 			//check for finish line
 			if (checkOverlap(player, finish)&& cooldown < 0)
 			{
 				player.laps++;
 				cooldown = 100;//resets cooldown to prevent multiple lap increments
+				if(player.laps >= 3){
+					socket.emit('gameWin', { id:player.id});
+					endText.setText("You Win!")
+				}
 			}
 			cooldown--;//decrement cooldown
 			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
 	
 	        // check for collisions
 	        var hitObstacle = game.physics.arcade.collide(player, obstacles);
-			var hitObstacle = game.physics.arcade.collide(player, obstacles);
+			//var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			
 			if(hitObstacle == true){
 				speed = 0;
@@ -258,7 +279,7 @@ window.onload = function() {
 
 			return false;
 		}
-
+		
     };
 
 // function create () {
