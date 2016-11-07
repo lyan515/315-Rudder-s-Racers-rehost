@@ -1,5 +1,5 @@
 var count;
-var socket;
+// var socket;
 
 window.onload = function() {
 
@@ -11,7 +11,14 @@ window.onload = function() {
 
 		var socket;
 		var otherPlayers;
-        
+        var player;
+
+		var angle = 0;
+    	var cursors;
+    	var speed = 400;
+    	var turnSpeed = 0.05;
+
+    	var obstacles;
 		function preload () {
 
 			game.load.image('logo', 'phaser.png');
@@ -22,25 +29,21 @@ window.onload = function() {
 			game.load.image('mapTR', 'campusCircuit_TR.png');
 			game.load.image('mapBL', 'campusCircuit_BL.png');
 			game.load.image('mapBR', 'campusCircuit_BR.png');
+			otherPlayers = [];
 			create();
-        }
-	
-		var player;
-
-		var angle = 0;
-    	var cursors;
-    	var speed = 400;
-    	var turnSpeed = 0.05;
-
-    	var obstacles;
-
-        function create () {
-
-            socket = io.connect({
+			
+			socket = io.connect({
 				'reconnection': true,
 				'reconnectionDelay': 1000,
 				'reconnectionDelayMax': 5000});
-				
+			setEventHandlers();
+        }
+	
+		
+
+        function create () {
+
+            
 			// enable Arcade Physics system
 	        game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -62,10 +65,10 @@ window.onload = function() {
 	        map.scale.setTo(3, 3);
 
 	        // player
-	        player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
+	        player = game.add.sprite(game.world.centerX, game.world.centerY, 'bluebike');
 	        player.anchor.setTo(0.5, 0.5);
 		    player.scale.setTo(0.5, 0.5);
-		    player.x =  3000;
+		    player.x =  2900;
 		    player.y = 16150;
 	        // player.enableBody = true;
 	        game.physics.arcade.enable(player);
@@ -83,11 +86,7 @@ window.onload = function() {
 
 	        // controls
 	        cursors = game.input.keyboard.createCursorKeys();
-			
-			otherPlayers = [];
-			
-			setEventHandlers();
-			
+
         }
 
         function toDegrees (angle) {
@@ -108,13 +107,18 @@ window.onload = function() {
 			socket.on('movePlayer', onMovePlayer);
 			socket.on('disconnect', onSocketDisconnect);
 			socket.on('removePlayer', onRemovePlayer);
+			socket.on('playerID', function(data) {
+				player.id = data.id;
+				player.playerNum = data.playerNum;
+				player.x += (player.playerNum*35); 
+			});
 		}
 		
 		function onSocketConnected() {
 			console.log('Connected to socket server');
 			
 			socket.emit('newPlayer', { x: player.x, y: player.y, angle: player.angle });
-			socket.on('playerID', function(data) {player.id = data.id;});
+	
 		}
 
 		function onSocketDisconnect () {
@@ -130,9 +134,11 @@ window.onload = function() {
 				console.log('Duplicate player!');
 				return;
 			}
-
+			if (player.id == data.id){
+				return;
+			}
 			// Add new player to the remote players array
-			otherPlayers.push(new OtherPlayer(data.id, game, player, data.x, data.y, data.angle));
+			otherPlayers.push(new OtherPlayer(data.id, game, player, data.playerNum, data.x, data.y, data.angle));
 			console.log(otherPlayers);
 		}
 		
@@ -144,8 +150,8 @@ window.onload = function() {
 				console.log('Player not found: ', data.id);
 				return
 			}
-			//console.log("moving " + this.id);
-		  // Update player position
+
+			// Update player position
 			movePlayer.player.x = data.x;
 			movePlayer.player.y = data.y;
 			movePlayer.player.angle = data.angle;
@@ -230,34 +236,34 @@ window.onload = function() {
 
     };
 
-function create () {
-	socket = io.connect();
-	setEventHandlers();
+// function create () {
+	// socket = io.connect();
+	// setEventHandlers();
 	
-}
+// }
 
-var setEventHandlers = function () {
+// var setEventHandlers = function () {
   // Socket connection successful
-  socket.on('connect', onSocketConnected);
-  socket.on('updateCount', onUpdateCount);
+  // socket.on('connect', onSocketConnected);
+  // socket.on('updateCount', onUpdateCount);
   // Socket disconnection
-  socket.on('disconnect', onSocketDisconnect);
-}
+  // socket.on('disconnect', onSocketDisconnect);
+// }
 
-function onSocketConnected () {
-	console.log('Connected to socket server');
-	socket.emit('connection');
-}
+// function onSocketConnected () {
+	// console.log('Connected to socket server');
+	// socket.emit('connection');
+// }
 
-function onUpdateCount (data) {
-	count = data.c;
-	console.log(count, "Players are connected");
-}
+// function onUpdateCount (data) {
+	// count = data.c;
+	// console.log(count, "Players are connected");
+// }
 
-function onSocketDisconnect () {
-  console.log('Disconnected from socket server');
-  socket.emit('disconnect');
-}
+// function onSocketDisconnect () {
+  // console.log('Disconnected from socket server');
+  // socket.emit('disconnect');
+// }
 
 
 
