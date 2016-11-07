@@ -10,7 +10,7 @@ var path = require('path');
 
 var connectionCount = 0;
 
-var PORT = 31337;					//we are 1337 h4x0r5
+var PORT = 31340;					//we are 1337 h4x0r5
 
 app.use(express.static('public'));
 
