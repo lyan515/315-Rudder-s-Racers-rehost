@@ -362,7 +362,7 @@ window.onload = function() {
 			if (checkOverlap(player, finish)&& cooldown < 0)
 			{
 				player.laps++;
-				cooldown = 100;//resets cooldown to prevent multiple lap increments
+				cooldown = 2400;//resets cooldown to prevent multiple lap increments
 				if(player.laps >= 3){
 					socket.emit('gameWin', { id:player.id});
 					endText.setText("You Win!")
