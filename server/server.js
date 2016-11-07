@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var socket = require('socket.io')(http);
 
 var Player = require('./player')
 
@@ -10,10 +10,12 @@ var path = require('path');
 
 var connectionCount = 0;
 
-var port = 31337;
+var PORT = 31337;					//we are 1337 h4x0r5
 
 app.use(express.static('public'));
 
+
+//mostly inspired by example code given to us on piazza
 app.get('/*', function(request, response){
     console.log('request starting...');
 
@@ -68,19 +70,19 @@ app.get('/*', function(request, response){
 
 });
 
-
+//Some ideas on how to run a game server taken from:
 //https://github.com/xicombd/phaser-multiplayer-game
 
 var players;
 
-http.listen(port, function(){
-    console.log('listening on *:' + port); //changed from 31337 for testing purposes
+http.listen(PORT, function(){	//start up the surver on current port
+    console.log('listening on *:'+PORT);
     init();
 });
 
-function init() {
+function init() {	//initialize player list, socket, and event handlers
     players = [];
-    socket = io.listen(http);
+    socket.listen(http);
     
     setEventHandlers();
 };
@@ -90,28 +92,29 @@ var setEventHandlers = function() {
 };
 
 function onSocketConnection(client) {
-    console.log('Player connected');
-    
-    client.on('newPlayer', onNewPlayer);
-    client.on('movePlayer', onMovePlayer);
-    client.on('disconnect', onClientDisconnect);
+    client.on('newPlayer', onNewPlayer);			//listen for new player
+    client.on('movePlayer', onMovePlayer);			//update a players location
+    client.on('disconnect', onClientDisconnect);	//a player disconnected
     
 };
 
 function onNewPlayer(data) {
-    var newPlayer = new Player(data.x, data.y, data.angle);
-    newPlayer.id = this.id;
+	console.log('Player connected: ' + this.id);
+    var newPlayer = new Player(data.x, data.y, data.angle);	//create the new player
+    newPlayer.id = this.id;		//set the player id to the same as the socket id since it is unique enough for our purposes
+	newPlayer.playerNum = players.length;	//set the players number to its new index
     
-    this.emit('playerID', {id: newPlayer.id});
-    this.broadcast.emit('newPlayer', {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), angle: newPlayer.getAngle()});
-    
-    var i, existingPlayer;
+    this.emit('playerID', {id: newPlayer.id, playerNum: newPlayer.playerNum});		//send the new player id back to the player
+    this.broadcast.emit('newPlayer', {id: newPlayer.id, playerNum: newPlayer.playerNum, x: newPlayer.getX(), y: newPlayer.getY(), angle: newPlayer.getAngle()});	//send the new players info to everyone else
+		
+    //send all of the currently connected players back to the new player
+	var i, existingPlayer;
     for (i = 0; i < players.length; i++) {
         existingPlayer = players[i]
-        this.emit('newPlayer', {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle()});
+        this.emit('newPlayer', {id: existingPlayer.id, playerNum: newPlayer.playerNum, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle()});
     }
     
-    players.push(newPlayer);
+    players.push(newPlayer);	//insert new player into servers list of players
 }
 
 function onMovePlayer (data) {
@@ -163,4 +166,4 @@ function playerById (id) {
 }
 
 // Put a friendly message on the terminal
-console.log("Server running at http://127.0.0.1:" + port + "/");
+console.log("Server running at http://127.0.0.1:" + PORT);

@@ -1,17 +1,21 @@
 var count;
-var socket;
+// var socket;
 
 window.onload = function() {
 
-        //  Note that this html file is set to pull down Phaser 2.5.0 from the JS Delivr CDN.
-        //  Although it will work fine with this tutorial, it's almost certainly not the most current version.
-        //  Be sure to replace it with an updated version before you start experimenting with adding your own code.
-
-        var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render });
+        var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 		var socket;
 		var otherPlayers;
-        
+        var player;
+
+		var angle = 0;
+    	var cursors;
+    	var speed = 400;
+    	var turnSpeed = 0.05;
+		var cooldown = 0;
+
+    	var obstacles;
 		function preload () {
 
 			game.load.image('logo', 'phaser.png');
@@ -23,25 +27,21 @@ window.onload = function() {
 			game.load.image('mapTR', 'campusCircuit_TR.png');
 			game.load.image('mapBL', 'campusCircuit_BL.png');
 			game.load.image('mapBR', 'campusCircuit_BR.png');
-			create();
-        }
-	
-		var player;
-
-		var angle = 0;
-    	var cursors;
-    	var speed = 400;
-    	var turnSpeed = 0.05;
-
-    	var obstacles;
-
-        function create () {
-
-            socket = io.connect({
+			
+			game.load.image('finish', 'finishline.png');
+			
+			otherPlayers = [];	//hold list of other players connected
+			create();			//load all of the objects onto the screen
+			
+			//create soccket connection
+			socket = io.connect({
 				'reconnection': true,
 				'reconnectionDelay': 1000,
 				'reconnectionDelayMax': 5000});
-				
+			setEventHandlers();
+        }
+	
+        function create () {				
 			// enable Arcade Physics system
 	        game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -61,6 +61,10 @@ window.onload = function() {
 	        map = game.add.sprite(game.world.width / 2, game.world.height / 2, 'mapBR');
 	        map.anchor.setTo(0, 0);
 	        map.scale.setTo(3, 3);
+			
+			//finish line
+			finish = game.add.sprite(3100, 16065, 'finish');
+			finish.scale.setTo(0.25, .75);
 
 	        // add arrows
 	        var arrow = game.add.sprite(2856, 16022, 'arrow');
@@ -189,10 +193,10 @@ window.onload = function() {
 	        arrow.angle = 180;
 
 	        // player
-	        player = game.add.sprite(3000, 16150, 'player');
+	        player = game.add.sprite(2900, 16150, 'bluebike');
 	        player.anchor.setTo(0.5, 0.5);
 		    player.scale.setTo(0.5, 0.5);
-	        // player.enableBody = true;
+		    player.laps = 0;
 	        game.physics.arcade.enable(player);
 	        player.body.collideWorldBounds = true;
 
@@ -204,42 +208,43 @@ window.onload = function() {
 
 	        // controls
 	        cursors = game.input.keyboard.createCursorKeys();
-			
-			otherPlayers = [];
-			
-			setEventHandlers();
-			
+
         }
 
         function toDegrees (angle) {
         	return angle * (180 / Math.PI);
 	    }
 		
-		function speedup(){
-			if(speed < 700){
+		function speedup(){		//acceleration function
+			if(speed < 700){	//max speed
 				speed+= 5;
 			}
 		}
 		
-		var setEventHandlers = function() {
-			socket.on('connect', onSocketConnected);
-			
-			socket.on('newPlayer', onNewPlayer);
-			
-			socket.on('movePlayer', onMovePlayer);
-			socket.on('disconnect', onSocketDisconnect);
-			socket.on('removePlayer', onRemovePlayer);
+		var setEventHandlers = function() {					//set all of the callback functions for socket events
+			socket.on('connect', onSocketConnected);		//new connection
+			socket.on('newPlayer', onNewPlayer);			//new player
+			socket.on('playerID', setPlayerId);				//send a new id to the new player
+			socket.on('movePlayer', onMovePlayer);			//one of the players has moved
+			socket.on('disconnect', onSocketDisconnect);	//player disconnected
+			socket.on('removePlayer', onRemovePlayer);		//remove player from game
 		}
 		
 		function onSocketConnected() {
 			console.log('Connected to socket server');
 			
-			socket.emit('newPlayer', { x: player.x, y: player.y, angle: player.angle });
-			socket.on('playerID', function(data) {player.id = data.id;});
+			socket.emit('newPlayer', { x: player.x, y: player.y, angle: player.angle });	//send server info to create new player
+	
 		}
 
 		function onSocketDisconnect () {
- 			console.log('Disconnected from socket server')
+ 			console.log('Disconnected from socket server');
+		}
+		
+		function setPlayerId(data) {
+			player.id = data.id;
+			player.playerNum = data.playerNum;	//index in the servers player list
+			player.x += (player.playerNum*35);	//set starting position based on how many people are connected
 		}
 		
 		function onNewPlayer (data) {
@@ -251,35 +256,49 @@ window.onload = function() {
 				console.log('Duplicate player!');
 				return;
 			}
-
+			if (player.id == data.id){
+				return;
+			}
+			
 			// Add new player to the remote players array
-			otherPlayers.push(new OtherPlayer(data.id, game, player, data.x, data.y, data.angle));
-			console.log(otherPlayers);
+			otherPlayers.push(new OtherPlayer(data.id, game, player, data.playerNum, data.x, data.y, data.angle));	//create new player and put it into list of current players
+			console.log(otherPlayers);	//debugging
 		}
 		
 		function onMovePlayer (data) {
-			var movePlayer = playerById(data.id);
+			var movePlayer = playerById(data.id);	//get the player that is currently being moved
 
 		  // Player not found
 			if (!movePlayer) {
 				console.log('Player not found: ', data.id);
 				return
 			}
-			//console.log("moving " + this.id);
-		  // Update player position
+
+			// Update player position
 			movePlayer.player.x = data.x;
 			movePlayer.player.y = data.y;
 			movePlayer.player.angle = data.angle;
+			movePlayer.player.laps = data.laps;
+			
+
+		}
+		
+		function checkOverlap(spriteA, spriteB) {
+
+			var boundsA = spriteA.getBounds();
+			var boundsB = spriteB.getBounds();
+
+			return Phaser.Rectangle.intersects(boundsA, boundsB);
 
 		}
 		
 		function update() {
 			// player movement
 	        // reset the player's velocity
-	        player.body.velocity.x = 0;
+			player.body.velocity.x = 0;
 	        player.body.velocity.y = 0;
 
-	        if (cursors.up.isDown) {
+	        if (cursors.up.isDown) {	//forward and backward movement
 				speedup();
 	            player.body.velocity.x = (speed * Math.sin(angle));
 	            player.body.velocity.y = (-speed * Math.cos(angle));
@@ -293,8 +312,8 @@ window.onload = function() {
 				speed = 0;
 			}
 
-	        if (cursors.left.isDown) {
-	            if (cursors.down.isDown) {
+	        if (cursors.left.isDown) {			//left and right angled movement
+	            if (cursors.down.isDown) {		//two buttons pressed simultaneously 
 	                angle -= turnSpeed * 0.5;
 	            }
 	            else if (cursors.up.isDown) {
@@ -314,36 +333,43 @@ window.onload = function() {
 
 	        // update camera position
 	        game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, 0.5, 0.5);
-
+			
+			//check for finish line
+			if (checkOverlap(player, finish)&& cooldown < 0)
+			{
+				player.laps++;
+				cooldown = 100;//resets cooldown to prevent multiple lap increments
+			}
+			cooldown--;//decrement cooldown
+			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
+	
 	        // check for collisions
 	        var hitObstacle = game.physics.arcade.collide(player, obstacles);
+			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			
 			if(hitObstacle == true){
 				speed = 0;
 			}
-			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle });
+			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle, laps: player.laps});
 		}
 
-		function render () {
-			game.debug.spriteInfo(player, 32, 32);
-		}
-
-		function onRemovePlayer (data) {
+		function onRemovePlayer (data) {					//remove player from client screen
 			var removePlayer = playerById(data.id)
 
-			  // Player not found
+			// Player not found
 			if (!removePlayer) {
 			  	console.log('Player not found: ', data.id)
 				return
 			}
+			
+			//remove from screen
+			removePlayer.player.kill();
 
-			removePlayer.player.kill()
-
-			  // Remove player from array
-			  otherPlayers.splice(otherPlayers.indexOf(removePlayer), 1)
+			// Remove player from array
+			otherPlayers.splice(otherPlayers.indexOf(removePlayer), 1);
 		}
 
-		function playerById (id) {
+		function playerById (id) {								//returns player from given id
 			for (var i = 0; i < otherPlayers.length; i++) {
 				if (otherPlayers[i].player.id === id) {
 					return otherPlayers[i];
@@ -354,35 +380,3 @@ window.onload = function() {
 		}
 
     };
-
-function create () {
-	socket = io.connect();
-	setEventHandlers();
-	
-}
-
-var setEventHandlers = function () {
-  // Socket connection successful
-  socket.on('connect', onSocketConnected);
-  socket.on('updateCount', onUpdateCount);
-  // Socket disconnection
-  socket.on('disconnect', onSocketDisconnect);
-}
-
-function onSocketConnected () {
-	console.log('Connected to socket server');
-	socket.emit('connection');
-}
-
-function onUpdateCount (data) {
-	count = data.c;
-	console.log(count, "Players are connected");
-}
-
-function onSocketDisconnect () {
-  console.log('Disconnected from socket server');
-  socket.emit('disconnect');
-}
-
-
-
