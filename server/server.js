@@ -93,6 +93,7 @@ function onSocketConnection(client) {
     client.on('newPlayer', onNewPlayer);
     client.on('movePlayer', onMovePlayer);
     client.on('disconnect', onClientDisconnect);
+	client.on('gameWin', onGameWin);
     
 };
 
@@ -131,6 +132,12 @@ function onMovePlayer (data) {
 
     // Broadcast updated position to connected socket clients
     this.broadcast.emit('movePlayer', {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), angle: movePlayer.getAngle()});
+}
+
+function onGameWin (data) {
+
+    // Broadcast updated position to connected socket clients
+    this.broadcast.emit('gameFinish', {id: data.id});
 }
 
 function onClientDisconnect () {
