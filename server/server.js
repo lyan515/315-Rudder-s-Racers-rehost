@@ -10,6 +10,8 @@ var path = require('path');
 
 var connectionCount = 0;
 
+var port = 31337;
+
 app.use(express.static('public'));
 
 app.get('/*', function(request, response){
@@ -71,8 +73,8 @@ app.get('/*', function(request, response){
 
 var players;
 
-http.listen(31337, function(){
-    console.log('listening on *:31338'); //changed from 31337 for testing purposes
+http.listen(port, function(){
+    console.log('listening on *:' + port); //changed from 31337 for testing purposes
     init();
 });
 
@@ -161,4 +163,4 @@ function playerById (id) {
 }
 
 // Put a friendly message on the terminal
-console.log("Server running at http://127.0.0.1:31337/");
+console.log("Server running at http://127.0.0.1:" + port + "/");
