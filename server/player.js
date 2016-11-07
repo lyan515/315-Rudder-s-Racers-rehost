@@ -1,10 +1,12 @@
+//stores all the functions and info needed for the server to keep track of players who are connected
+
 var Player = function (startX, startY, startAngle) {
-	var x = startX;
-	var y = startY;
-	var angle = startAngle;
-	var id;
-	var playerNum;
-	var lapNum = 0;
+	var x = startX;				//current x coordinate
+	var y = startY;				//current y coordinate
+	var angle = startAngle;		//current angle
+	var id;						//unique id number
+	var playerNum;				//index in servers list of players
+	var lapNum = 0;				//lap currently on
 	
 	var getX = function () {
 		return x

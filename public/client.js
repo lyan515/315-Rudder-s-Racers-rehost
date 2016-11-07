@@ -3,10 +3,6 @@ var count;
 
 window.onload = function() {
 
-        //  Note that this html file is set to pull down Phaser 2.5.0 from the JS Delivr CDN.
-        //  Although it will work fine with this tutorial, it's almost certainly not the most current version.
-        //  Be sure to replace it with an updated version before you start experimenting with adding your own code.
-
         var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 		var socket;
@@ -26,16 +22,19 @@ window.onload = function() {
 			game.load.image('logo', 'phaser.png');
 			game.load.image('bluebike', 'bluebike.png');
 			game.load.image('trashCan', 'trashCan.png');
+			game.load.image('arrow', 'arrow.png');
 			// total map size: 7680 x 6694
 			game.load.image('mapTL', 'campusCircuit_TL.png');
 			game.load.image('mapTR', 'campusCircuit_TR.png');
 			game.load.image('mapBL', 'campusCircuit_BL.png');
 			game.load.image('mapBR', 'campusCircuit_BR.png');
+			
 			game.load.image('finish', 'finishline.png');
 			
-			otherPlayers = [];
-			create();
+			otherPlayers = [];	//hold list of other players connected
+			create();			//load all of the objects onto the screen
 			
+			//create soccket connection
 			socket = io.connect({
 				'reconnection': true,
 				'reconnectionDelay': 1000,
@@ -68,22 +67,141 @@ window.onload = function() {
 			finish = game.add.sprite(3100, 16065, 'finish');
 			finish.scale.setTo(0.25, .75);
 
+	        // add arrows
+	        var arrow = game.add.sprite(2856, 16022, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = -90;
+	        arrow = game.add.sprite(2878, 13332, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = -90;
+	        arrow = game.add.sprite(2789, 8872, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = -90;
+	        arrow = game.add.sprite(2896, 4725, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = -90;
+	        arrow = game.add.sprite(2896, 1316, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow = game.add.sprite(8869, 1316, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow = game.add.sprite(12192, 1316, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow = game.add.sprite(18124, 1316, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow = game.add.sprite(20113, 1440, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 90;
+	        arrow = game.add.sprite(19721, 5366, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 90;
+	        arrow = game.add.sprite(20053, 7105, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 135;
+	        arrow = game.add.sprite(19055, 7962, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 90;
+	        arrow = game.add.sprite(19093, 8894, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 90;
+	        arrow = game.add.sprite(19429, 8894, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 90;
+	        arrow = game.add.sprite(19188, 10409, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 135;
+	        arrow = game.add.sprite(18498, 11000, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 180;
+	        arrow = game.add.sprite(17242, 10245, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 135;
+	        arrow = game.add.sprite(16449, 11225, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 180;
+	        arrow = game.add.sprite(16449, 10428, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 180;
+	        arrow = game.add.sprite(15552, 11225, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 180;
+	        arrow = game.add.sprite(15552, 10428, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 180;
+	        arrow = game.add.sprite(14344, 11225, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 180;
+	        arrow = game.add.sprite(14244, 10428, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 180;
+	        arrow = game.add.sprite(13357, 10517, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 135;
+	        arrow = game.add.sprite(12772, 10821, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 90;
+	        arrow = game.add.sprite(13251, 13685, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 90;
+	        arrow = game.add.sprite(13235, 16722, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 90;
+	        arrow = game.add.sprite(13020, 18800, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 180;
+	        arrow = game.add.sprite(9628, 18800, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 180;
+	        arrow = game.add.sprite(8520, 18668, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = -90;
+	        arrow = game.add.sprite(8770, 16183, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = -135;
+	        arrow = game.add.sprite(5654, 16263, 'arrow');
+	        arrow.anchor.setTo(0.5, 0.5);
+	        arrow.scale.setTo(0.1, 0.1);
+	        arrow.angle = 180;
+
 	        // player
-	        player = game.add.sprite(game.world.centerX, game.world.centerY, 'bluebike');
+	        player = game.add.sprite(2900, 16150, 'bluebike');
 	        player.anchor.setTo(0.5, 0.5);
 		    player.scale.setTo(0.5, 0.5);
-		    player.x =  2900;
-		    player.y = 16150;
-			player.laps = 0;
-	        // player.enableBody = true;
+		    player.laps = 0;
 	        game.physics.arcade.enable(player);
 	        player.body.collideWorldBounds = true;
 
 	        // set up obstacles
-	        obstacles = game.add.group();
-	        obstacles.enableBody = true;
-	        var staticObstacle = obstacles.create(600, 400, 'trashCan');
-	        staticObstacle.body.immovable = true;
 
 	        // set up camera size
 	        game.camera.width = 1280;
@@ -106,37 +224,44 @@ window.onload = function() {
         	return angle * (180 / Math.PI);
 	    }
 		
-		function speedup(){
-			if(speed < 700){
+		function speedup(){		//acceleration function
+			if(speed < 700){	//max speed
 				speed+= 5;
 			}
 		}
 		
-		var setEventHandlers = function() {
-			socket.on('connect', onSocketConnected);
+		var setEventHandlers = function() {//set all of the callback functions for socket events
+			socket.on('connect', onSocketConnected);//new connection
 			
-			socket.on('newPlayer', onNewPlayer);
+			socket.on('newPlayer', onNewPlayer);//new player
 			
-			socket.on('movePlayer', onMovePlayer);
-			socket.on('disconnect', onSocketDisconnect);
-			socket.on('removePlayer', onRemovePlayer);
+			socket.on('movePlayer', onMovePlayer);//send a new id to the new player
+			socket.on('disconnect', onSocketDisconnect);//one of the players has moved
+			socket.on('removePlayer', onRemovePlayer);//player disconnected
 			socket.on('playerID', function(data) {
 				player.id = data.id;
 				player.playerNum = data.playerNum;
 				player.x += (player.playerNum*35); 
 			});
-			socket.on('gameFinish', onGameFinish);
+			socket.on('gameFinish', onGameFinish);//remove player from game
+
 		}
 		
 		function onSocketConnected() {
 			console.log('Connected to socket server');
 			
-			socket.emit('newPlayer', { x: player.x, y: player.y, angle: player.angle });
+			socket.emit('newPlayer', { x: player.x, y: player.y, angle: player.angle });	//send server info to create new player
 	
 		}
 
 		function onSocketDisconnect () {
- 			console.log('Disconnected from socket server')
+ 			console.log('Disconnected from socket server');
+		}
+		
+		function setPlayerId(data) {
+			player.id = data.id;
+			player.playerNum = data.playerNum;	//index in the servers player list
+			player.x += (player.playerNum*35);	//set starting position based on how many people are connected
 		}
 		
 		function onNewPlayer (data) {
@@ -151,13 +276,14 @@ window.onload = function() {
 			if (player.id == data.id){
 				return;
 			}
+			
 			// Add new player to the remote players array
-			otherPlayers.push(new OtherPlayer(data.id, game, player, data.playerNum, data.x, data.y, data.angle));
-			console.log(otherPlayers);
+			otherPlayers.push(new OtherPlayer(data.id, game, player, data.playerNum, data.x, data.y, data.angle));	//create new player and put it into list of current players
+			console.log(otherPlayers);	//debugging
 		}
 		
 		function onMovePlayer (data) {
-			var movePlayer = playerById(data.id);
+			var movePlayer = playerById(data.id);	//get the player that is currently being moved
 
 		  // Player not found
 			if (!movePlayer) {
@@ -194,7 +320,7 @@ window.onload = function() {
 			player.body.velocity.x = 0;
 	        player.body.velocity.y = 0;
 
-	        if (cursors.up.isDown) {
+	        if (cursors.up.isDown) {	//forward and backward movement
 				speedup();
 	            player.body.velocity.x = (speed * Math.sin(angle));
 	            player.body.velocity.y = (-speed * Math.cos(angle));
@@ -208,8 +334,8 @@ window.onload = function() {
 				speed = 0;
 			}
 
-	        if (cursors.left.isDown) {
-	            if (cursors.down.isDown) {
+	        if (cursors.left.isDown) {			//left and right angled movement
+	            if (cursors.down.isDown) {		//two buttons pressed simultaneously 
 	                angle -= turnSpeed * 0.5;
 	            }
 	            else if (cursors.up.isDown) {
@@ -255,22 +381,23 @@ window.onload = function() {
 			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle, laps: player.laps});
 		}
 
-		function onRemovePlayer (data) {
+		function onRemovePlayer (data) {					//remove player from client screen
 			var removePlayer = playerById(data.id)
 
-			  // Player not found
+			// Player not found
 			if (!removePlayer) {
 			  	console.log('Player not found: ', data.id)
 				return
 			}
+			
+			//remove from screen
+			removePlayer.player.kill();
 
-			removePlayer.player.kill()
-
-			  // Remove player from array
-			  otherPlayers.splice(otherPlayers.indexOf(removePlayer), 1)
+			// Remove player from array
+			otherPlayers.splice(otherPlayers.indexOf(removePlayer), 1);
 		}
 
-		function playerById (id) {
+		function playerById (id) {								//returns player from given id
 			for (var i = 0; i < otherPlayers.length; i++) {
 				if (otherPlayers[i].player.id === id) {
 					return otherPlayers[i];
@@ -281,35 +408,4 @@ window.onload = function() {
 		}
 		
     };
-
-// function create () {
-	// socket = io.connect();
-	// setEventHandlers();
-	
-// }
-
-// var setEventHandlers = function () {
-  // Socket connection successful
-  // socket.on('connect', onSocketConnected);
-  // socket.on('updateCount', onUpdateCount);
-  // Socket disconnection
-  // socket.on('disconnect', onSocketDisconnect);
-// }
-
-// function onSocketConnected () {
-	// console.log('Connected to socket server');
-	// socket.emit('connection');
-// }
-
-// function onUpdateCount (data) {
-	// count = data.c;
-	// console.log(count, "Players are connected");
-// }
-
-// function onSocketDisconnect () {
-  // console.log('Disconnected from socket server');
-  // socket.emit('disconnect');
-// }
-
-
 
