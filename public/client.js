@@ -1,6 +1,3 @@
-var count;
-// var socket;
-
 window.onload = function() {
 
         var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update });
