@@ -17,6 +17,7 @@ window.onload = function() {
     	var cursors;
     	var speed = 400;
     	var turnSpeed = 0.05;
+		var cooldown = 0;
 
     	var obstacles;
 		function preload () {
@@ -29,10 +30,9 @@ window.onload = function() {
 			game.load.image('mapTR', 'campusCircuit_TR.png');
 			game.load.image('mapBL', 'campusCircuit_BL.png');
 			game.load.image('mapBR', 'campusCircuit_BR.png');
-			otherPlayers = [];
-
 			game.load.image('finish', 'finishline.png');
-
+			
+			otherPlayers = [];
 			create();
 			
 			socket = io.connect({
@@ -42,18 +42,6 @@ window.onload = function() {
 			setEventHandlers();
         }
 	
-        function create () {
-
-		var player;
-
-		var angle = 0;
-    	var cursors;
-    	var speed = 400;
-    	var turnSpeed = 0.05;
-		var cooldown = 0;
-
-    	var obstacles;
-
         function create () {				
 			// enable Arcade Physics system
 	        game.physics.startSystem(Phaser.Physics.ARCADE);
