@@ -30,6 +30,9 @@ window.onload = function() {
 			game.load.image('mapBL', 'campusCircuit_BL.png');
 			game.load.image('mapBR', 'campusCircuit_BR.png');
 			otherPlayers = [];
+
+			game.load.image('finish', 'finishline.png');
+
 			create();
 			
 			socket = io.connect({
@@ -39,11 +42,24 @@ window.onload = function() {
 			setEventHandlers();
         }
 	
-		
-
         function create () {
 
-            
+		var player;
+
+		var angle = 0;
+    	var cursors;
+    	var speed = 400;
+    	var turnSpeed = 0.05;
+		var cooldown = 0;
+
+    	var obstacles;
+
+        function create () {
+            socket = io.connect({
+				'reconnection': true,
+				'reconnectionDelay': 1000,
+				'reconnectionDelayMax': 5000});
+				
 			// enable Arcade Physics system
 	        game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -63,6 +79,10 @@ window.onload = function() {
 	        map = game.add.sprite(game.world.width / 2, game.world.height / 2, 'mapBR');
 	        map.anchor.setTo(0, 0);
 	        map.scale.setTo(3, 3);
+			
+			//finish line
+			finish = game.add.sprite(3100, 16065, 'finish');
+			finish.scale.setTo(0.25, .75);
 
 	        // player
 	        player = game.add.sprite(game.world.centerX, game.world.centerY, 'bluebike');
@@ -70,6 +90,7 @@ window.onload = function() {
 		    player.scale.setTo(0.5, 0.5);
 		    player.x =  2900;
 		    player.y = 16150;
+			player.laps = 0;
 	        // player.enableBody = true;
 	        game.physics.arcade.enable(player);
 	        player.body.collideWorldBounds = true;
@@ -155,13 +176,24 @@ window.onload = function() {
 			movePlayer.player.x = data.x;
 			movePlayer.player.y = data.y;
 			movePlayer.player.angle = data.angle;
+			movePlayer.player.laps = data.laps;
+			
+
+		}
+		
+		function checkOverlap(spriteA, spriteB) {
+
+			var boundsA = spriteA.getBounds();
+			var boundsB = spriteB.getBounds();
+
+			return Phaser.Rectangle.intersects(boundsA, boundsB);
 
 		}
 		
 		function update() {
 			// player movement
 	        // reset the player's velocity
-	        player.body.velocity.x = 0;
+			player.body.velocity.x = 0;
 	        player.body.velocity.y = 0;
 
 	        if (cursors.up.isDown) {
@@ -199,14 +231,24 @@ window.onload = function() {
 
 	        // update camera position
 	        game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, 0.5, 0.5);
-
+			
+			//check for finish line
+			if (checkOverlap(player, finish)&& cooldown < 0)
+			{
+				player.laps++;
+				cooldown = 100;//resets cooldown to prevent multiple lap increments
+			}
+			cooldown--;//decrement cooldown
+			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
+	
 	        // check for collisions
 	        var hitObstacle = game.physics.arcade.collide(player, obstacles);
+			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			
 			if(hitObstacle == true){
 				speed = 0;
 			}
-			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle });
+			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle, laps: player.laps});
 		}
 
 		function onRemovePlayer (data) {
