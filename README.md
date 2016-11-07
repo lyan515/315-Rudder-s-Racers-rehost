@@ -1,4 +1,10 @@
 # Rudders Racers  
+##View Deliverables
+To clone directory:  
+`git clone git@github.tamu.edu:ameserole/315-game-TheIDontKnows.git`  
+To view deliverable 4:   
+`git checkout D4` 
+
 ##Running Game Server  
 To run server run the command: 
 `node server/server.js`  

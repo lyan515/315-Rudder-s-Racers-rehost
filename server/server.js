@@ -8,14 +8,13 @@ var Player = require('./player')
 var fs = require('fs');
 var path = require('path');
 
-var connectionCount = 0;
-
-var PORT = 31340;					//we are 1337 h4x0r5
+var PORT = 31337;					//we are 1337 h4x0r5
 
 app.use(express.static('public'));
-
+var players;
 
 //mostly inspired by example code given to us on piazza
+//returns requested files
 app.get('/*', function(request, response){
     console.log('request starting...');
 
@@ -73,7 +72,7 @@ app.get('/*', function(request, response){
 //Some ideas on how to run a game server taken from:
 //https://github.com/xicombd/phaser-multiplayer-game
 
-var players;
+
 
 http.listen(PORT, function(){	//start up the surver on current port
     console.log('listening on *:'+PORT);
@@ -173,4 +172,4 @@ function playerById (id) {
 }
 
 // Put a friendly message on the terminal
-console.log("Server running at http://127.0.0.1:" + PORT);
+console.log("Server running at http://compute.cse.tamu.edu:" + PORT);
