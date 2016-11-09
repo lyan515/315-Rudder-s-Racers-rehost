@@ -1,6 +1,6 @@
 window.onload = function() {
 
-        var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update});
+        var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render});
 
 		var socket;
 		var otherPlayers;
@@ -18,6 +18,7 @@ window.onload = function() {
 		var endText;
 
     	var obstacles;
+    	var boundaries;
 		function preload () {
 
 			game.load.image('logo', 'phaser.png');
@@ -275,8 +276,18 @@ window.onload = function() {
 	        arrow.angle = 180;
 		}
 
+		function createBoundaries() {
+			// boundaries = game.add.group();
+			// boundaries.enableBody = true;
+			// var boundary = boundaries.create(2900, 14000);
+			// boundary.anchor.setTo(0.5, 0.5);
+			// boundary.width = 1000;
+			// boundary.height = 100;
+			// boundary.body.immovable = true;
+		}
+
 	
-        function create () {				
+        function create () {
 			// enable Arcade Physics system
 	        game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -315,6 +326,9 @@ window.onload = function() {
 
 	        // set up obstacles
 			createObs();
+
+			// add boundaries
+			createBoundaries();
 			
 	        // set up camera size
 	        game.camera.width = 1280;
@@ -521,11 +535,17 @@ window.onload = function() {
 	        // check for collisions
 	        //var hitArrows = game.physics.arcade.collide(player, arrow);
 			var hitObstacle = game.physics.arcade.collide(player, obstacles);
+
+			var hitBoundaries = game.physics.arcade.collide(player, boundaries);
 			
 			if(hitObstacle == true){
 				speed = 0;
 			}
 			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle, laps: player.laps});
+		}
+
+		function render () {
+			game.debug.spriteInfo(player, 32, 32);
 		}
 
 		function onRemovePlayer (data) {					//remove player from client screen
