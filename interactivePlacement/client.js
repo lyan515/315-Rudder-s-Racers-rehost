@@ -195,12 +195,8 @@ window.onload = function() {
 	    }
 
 	    function printAllObjects () {
-	    	var result = "objects{";
-	    	result += "boundaries{"
-	    	for (var i = 0; i < boundaries.length; i++) {
-	    		result += JSON.stringify(boundaries[i]);
-	    	}
-	    	result += "}";
+	    	var result = '{ "boundaries" :';
+	    	result += JSON.stringify(boundaries);
 	    	result += "}";
 	    	console.log(result);
 	    }
