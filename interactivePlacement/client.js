@@ -24,10 +24,6 @@ window.onload = function() {
     	var rightClicked = false;
     	var enterPressed = false;
 
-    	var x1;
-		var y1;
-		var x2;
-		var y2;
 		var currentObject;
 		var Rectangle = function () {
 			var rawX = 0;
@@ -137,7 +133,7 @@ window.onload = function() {
 					currentObject.rawWidth *= -1;
 					currentObject.scaledWidth *= -1;
 				}
-				if (currentObject.height < 0) {
+				if (currentObject.rawHeight < 0) {
 					currentObject.rawY = currentObject.rawY + currentObject.rawHeight;
 					currentObject.scaledY = currentObject.scaledY + currentObject.scaledHeight;
 					currentObject.rawHeight *= -1;
@@ -154,22 +150,21 @@ window.onload = function() {
 				drawObjects();
 			}
 			else if (game.input.activePointer.rightButton.isUp && rightClicked) {
-				var rawX = game.input.activePointer.worldX;
-				var rawY = game.input.activePointer.worldY;
-				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.x;
-				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.y;
-				//console.log("right mouse button released at (" + scaledX + ", " + scaledY + ")");
 				rightClicked = false;
 			}
 			if (leftClicked) {
 				graphics.clear();
 				drawObjects();
 				graphics.lineStyle(4, 0xff0000, 1);
-				x2 = game.input.activePointer.worldX / game.world.scale.x;
-				y2 = game.input.activePointer.worldY / game.world.scale.y;
-				currentObject.width = x2 - currentObject.x;
-				currentObject.height = y2 - currentObject.y;
-				graphics.drawRect(x1, y1, currentObject.width, currentObject.height);
+				var rawX = game.input.activePointer.worldX;
+				var rawY = game.input.activePointer.worldY;
+				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.x;
+				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.y;
+				currentObject.rawWidth = rawX - currentObject.rawX;
+				currentObject.rawHeight = rawY - currentObject.rawY;
+				currentObject.scaledWidth = scaledX - currentObject.scaledX;
+				currentObject.scaledHeight = scaledY - currentObject.scaledY;
+				graphics.drawRect(currentObject.rawX, currentObject.rawY, currentObject.rawWidth, currentObject.rawHeight);
 			}
 			if (game.input.keyboard.isDown(Phaser.KeyCode.ENTER) && !enterPressed) {
 				printAllObjects();
@@ -183,7 +178,7 @@ window.onload = function() {
 	    function drawObjects() {
 	    	for (var i = 0; i < boundaries.length; i++) {
 	    		graphics.lineStyle(4, 0xff0000, 1);
-	    		graphics.drawRect(boundaries[i].x, boundaries[i].y, boundaries[i].width, boundaries[i].height);
+	    		graphics.drawRect(boundaries[i].rawX, boundaries[i].rawY, boundaries[i].rawWidth, boundaries[i].rawHeight);
 	    	}
 	    }
 
