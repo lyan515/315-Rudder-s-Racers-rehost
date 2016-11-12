@@ -1,6 +1,14 @@
 window.onload = function() {
 
-        var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render});
+		var MAPPANELWIDTH = 3840;
+		var MAPPANELHEIGHT = 3347;
+		var SCALEFACTOR = 2;
+		var WORLDWIDTH = MAPPANELWIDTH * 2 * SCALEFACTOR;
+    	var WORLDHEIGHT = MAPPANELHEIGHT * 2 * SCALEFACTOR;
+    	var WINDOWWIDTH = 1280;
+    	var WINDOWHEIGHT = 720;
+
+        var game = new Phaser.Game(WINDOWWIDTH, WINDOWHEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render});
 
 		var socket;
 		var otherPlayers;

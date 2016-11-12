@@ -1,9 +1,11 @@
 window.onload = function() {
 
-		var WORLDWIDTH = 23040;
-    	var WORLDHEIGHT = 20082;
+		var MAPPANELWIDTH = 3840;
+		var MAPPANELHEIGHT = 3347;
+		var SCALEFACTOR = 2;
+		var WORLDWIDTH = MAPPANELWIDTH * 2 * SCALEFACTOR;
+    	var WORLDHEIGHT = MAPPANELHEIGHT * 2 * SCALEFACTOR;
     	var WINDOWHEIGHT = 900;
-    	var SCALEFACTOR = 3;
 
     	var CAMERASCROLLSPEED = 10;
     	var CAMERAZOOMSPEED = 0.1;
@@ -83,8 +85,9 @@ window.onload = function() {
 		var y1;
 		var x2;
 		var y2;
-		var currentRectangle
-		var shapes = [];
+		var currentObject;
+		var boundaries = [];
+		var obstacles = [];
 		var Rectangle = function () {
 			var x = 0;
 			var y = 0;
@@ -107,61 +110,62 @@ window.onload = function() {
 			if (game.input.activePointer.leftButton.isDown && !leftClicked) {
 				var rawX = game.input.activePointer.worldX;
 				var rawY = game.input.activePointer.worldY;
-				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT);
-				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT);
+				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.x;
+				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.y;
 				console.log("left mouse button clicked at (" + scaledX + ", " + scaledY + ")");
 				leftClicked = true;
-				x1 = game.input.activePointer.worldX;
-				y1 = game.input.activePointer.worldY;
-				currentRectangle = new Rectangle();
-				currentRectangle.x = x1;
-				currentRectangle.y = y1;
+				x1 = game.input.activePointer.worldX / game.world.scale.x;
+				y1 = game.input.activePointer.worldY / game.world.scale.y;
+				currentObject = new Rectangle();
+				currentObject.x = x1;
+				currentObject.y = y1;
 			}
 			else if (game.input.activePointer.leftButton.isUp && leftClicked) {
 				var rawX = game.input.activePointer.worldX;
 				var rawY = game.input.activePointer.worldY;
-				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT);
-				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT);
+				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.x;
+				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.y;
 				console.log("left mouse button released at (" + scaledX + ", " + scaledY + ")");
 				leftClicked = false;
-				shapes.push(currentRectangle);
+				boundaries.push(currentObject);
 			}
 			if (game.input.activePointer.rightButton.isDown && !rightClicked) {
 				var rawX = game.input.activePointer.worldX;
 				var rawY = game.input.activePointer.worldY;
-				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT);
-				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT);
+				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.x;
+				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.y;
 				console.log("right mouse button clicked at (" + scaledX + ", " + scaledY + ")");
 				rightClicked = true;
+				graphics.clear();
+				if (boundaries.length > 0) {
+					boundaries.splice(boundaries.length - 1);
+				}
+				drawObjects();
 			}
 			else if (game.input.activePointer.rightButton.isUp && rightClicked) {
 				var rawX = game.input.activePointer.worldX;
 				var rawY = game.input.activePointer.worldY;
-				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT);
-				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT);
+				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.x;
+				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.y;
 				console.log("right mouse button released at (" + scaledX + ", " + scaledY + ")");
 				rightClicked = false;
 			}
 			if (leftClicked) {
 				graphics.clear();
-				drawShapes(shapes);
+				drawObjects();
 				graphics.lineStyle(4, 0xff0000, 1);
-				x2 = game.input.activePointer.worldX;
-				y2 = game.input.activePointer.worldY;
-				currentRectangle.width = x2 - currentRectangle.x;
-				currentRectangle.height = y2 - currentRectangle.y;
-				graphics.drawRect(x1, y1, currentRectangle.width, currentRectangle.height);
-			}
-			if (rightClicked) {
-				graphics.clear();
-				shapes = [];
+				x2 = game.input.activePointer.worldX / game.world.scale.x;
+				y2 = game.input.activePointer.worldY / game.world.scale.y;
+				currentObject.width = x2 - currentObject.x;
+				currentObject.height = y2 - currentObject.y;
+				graphics.drawRect(x1, y1, currentObject.width, currentObject.height);
 			}
 	    }
 
-	    function drawShapes(shapes) {
-	    	for (var i = 0; i < shapes.length; i++) {
+	    function drawObjects() {
+	    	for (var i = 0; i < boundaries.length; i++) {
 	    		graphics.lineStyle(4, 0xff0000, 1);
-	    		graphics.drawRect(shapes[i].x, shapes[i].y, shapes[i].width, shapes[i].height);
+	    		graphics.drawRect(boundaries[i].x, boundaries[i].y, boundaries[i].width, boundaries[i].height);
 	    	}
 	    }
 
