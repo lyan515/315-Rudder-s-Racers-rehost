@@ -22,6 +22,23 @@ window.onload = function() {
     	var cursors;
     	var leftClicked = false;
     	var rightClicked = false;
+    	var enterPressed = false;
+
+    	var x1;
+		var y1;
+		var x2;
+		var y2;
+		var currentObject;
+		var Rectangle = function () {
+			var rawX = 0;
+			var rawY = 0;
+			var scaledX = 0;
+			var scaledY = 0;
+			var rawWidth = 0;
+			var rawHeight = 0;
+			var scaledWidth = 0;
+			var scaledHeight = 0;
+		}
 
 		function preload () {
 
@@ -81,19 +98,6 @@ window.onload = function() {
 
 		}
 		
-		var x1;
-		var y1;
-		var x2;
-		var y2;
-		var currentObject;
-		var boundaries = [];
-		var obstacles = [];
-		var Rectangle = function () {
-			var x = 0;
-			var y = 0;
-			var width = 0;
-			var height = 0;
-		}
 		function update() {
 			if (cursors.up.isDown) {
 				game.camera.y -= CAMERASCROLLSPEED;
@@ -112,29 +116,36 @@ window.onload = function() {
 				var rawY = game.input.activePointer.worldY;
 				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.x;
 				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.y;
-				console.log("left mouse button clicked at (" + scaledX + ", " + scaledY + ")");
 				leftClicked = true;
 				x1 = game.input.activePointer.worldX / game.world.scale.x;
 				y1 = game.input.activePointer.worldY / game.world.scale.y;
 				currentObject = new Rectangle();
-				currentObject.x = x1;
-				currentObject.y = y1;
+				currentObject.rawX = x1;
+				currentObject.rawY = y1;
+				currentObject.scaledX = scaledX;
+				currentObject.scaledY = scaledY;
 			}
 			else if (game.input.activePointer.leftButton.isUp && leftClicked) {
 				var rawX = game.input.activePointer.worldX;
 				var rawY = game.input.activePointer.worldY;
 				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.x;
 				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.y;
-				console.log("left mouse button released at (" + scaledX + ", " + scaledY + ")");
 				leftClicked = false;
+				if (currentObject.rawWidth < 0) {
+					currentObject.rawX = currentObject.rawX + currentObject.rawWidth;
+					currentObject.scaledX = currentObject.scaledX + currentObject.scaledWidth;
+					currentObject.rawWidth *= -1;
+					currentObject.scaledWidth *= -1;
+				}
+				if (currentObject.height < 0) {
+					currentObject.rawY = currentObject.rawY + currentObject.rawHeight;
+					currentObject.scaledY = currentObject.scaledY + currentObject.scaledHeight;
+					currentObject.rawHeight *= -1;
+					currentObject.scaledHeight *= -1;
+				}
 				boundaries.push(currentObject);
 			}
 			if (game.input.activePointer.rightButton.isDown && !rightClicked) {
-				var rawX = game.input.activePointer.worldX;
-				var rawY = game.input.activePointer.worldY;
-				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.x;
-				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.y;
-				console.log("right mouse button clicked at (" + scaledX + ", " + scaledY + ")");
 				rightClicked = true;
 				graphics.clear();
 				if (boundaries.length > 0) {
@@ -147,7 +158,7 @@ window.onload = function() {
 				var rawY = game.input.activePointer.worldY;
 				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.x;
 				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.y;
-				console.log("right mouse button released at (" + scaledX + ", " + scaledY + ")");
+				//console.log("right mouse button released at (" + scaledX + ", " + scaledY + ")");
 				rightClicked = false;
 			}
 			if (leftClicked) {
@@ -159,6 +170,13 @@ window.onload = function() {
 				currentObject.width = x2 - currentObject.x;
 				currentObject.height = y2 - currentObject.y;
 				graphics.drawRect(x1, y1, currentObject.width, currentObject.height);
+			}
+			if (game.input.keyboard.isDown(Phaser.KeyCode.ENTER) && !enterPressed) {
+				printAllObjects();
+				enterPressed = true;
+			}
+			else if (!game.input.keyboard.isDown(Phaser.KeyCode.ENTER) && enterPressed) {
+				enterPressed = false;
 			}
 	    }
 
@@ -180,6 +198,16 @@ window.onload = function() {
 	    		}
 	    	}
 	    }
-		
+
+	    function printAllObjects () {
+	    	var result = "objects{";
+	    	result += "boundaries{"
+	    	for (var i = 0; i < boundaries.length; i++) {
+	    		result += JSON.stringify(boundaries[i]);
+	    	}
+	    	result += "}";
+	    	result += "}";
+	    	console.log(result);
+	    }
     };
 
