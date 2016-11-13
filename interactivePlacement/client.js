@@ -1,4 +1,4 @@
-window.onload = function() {
+//window.onload = function() {
 
 		var MAPPANELWIDTH = 3840;
 		var MAPPANELHEIGHT = 3347;
@@ -167,18 +167,9 @@ window.onload = function() {
 				graphics.drawRect(currentObject.rawX, currentObject.rawY, currentObject.rawWidth, currentObject.rawHeight);
 			}
 
-			// graphics.clear();
-			// 	drawObjects();
-			// 	graphics.lineStyle(4, 0xff0000, 1);
-			// 	x2 = game.input.activePointer.worldX / game.world.scale.x;
-			// 	y2 = game.input.activePointer.worldY / game.world.scale.y;
-			// 	currentObject.width = x2 - currentObject.x;
-			// 	currentObject.height = y2 - currentObject.y;
-			// 	graphics.drawRect(x1, y1, currentObject.width, currentObject.height);
-
-
 			if (game.input.keyboard.isDown(Phaser.KeyCode.ENTER) && !enterPressed) {
-				printAllObjects();
+				//printAllObjects();
+				loadObjects("objects.txt");
 				enterPressed = true;
 			}
 			else if (!game.input.keyboard.isDown(Phaser.KeyCode.ENTER) && enterPressed) {
@@ -206,10 +197,36 @@ window.onload = function() {
 	    }
 
 	    function printAllObjects () {
-	    	var result = '{ "boundaries" :';
+	    	var result = '{"boundaries":';
 	    	result += JSON.stringify(boundaries);
 	    	result += "}";
 	    	console.log(result);
 	    }
-    };
 
+	    function loadObjects (filePath) {
+	    	var objectsString = readTextFile(filePath);
+	    	if (objectsString) {
+	    		var objects = JSON.parse(objectsString);
+		    	boundaries = objects.boundaries;
+		    	//obstacles = objects.obstacles;
+		    	//powerUps = objects.powerUps;
+		    	drawObjects();
+		    }
+		    else {
+		    	console.log("File empty");
+		    }
+	    }
+
+	    var reader = new XMLHttpRequest() || new ActiveXObject('MSXML2.XMLHTTP');
+		var response = "";
+		function readTextFile(filePath) {
+		    reader.open('get', filePath, true); 
+		    reader.onreadystatechange = function () {
+		    	if (reader.readyState == 4) {
+		    		response = reader.responseText;
+		    		console.log("response: " + response);
+		    	}
+		    }
+		    reader.send(null);
+		    return response;
+		}
