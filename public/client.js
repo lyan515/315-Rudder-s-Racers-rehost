@@ -287,6 +287,8 @@ window.onload = function() {
 		}
 
 		function createBoundaries() {
+			var testString = readTextFile("objects.txt");
+			console.log("objects.txt: " + testString);
 			console.log("create boundaries called");
 			var objects = JSON.parse(objectsString);
 			var boundaryArray = objects.boundaries;
@@ -591,13 +593,17 @@ window.onload = function() {
 			return false;
 		}
 
-		function readTextFile(file)
-		{
-		    var reader = new FileReader();
-		    reader.onload = function (event) {
-		    	reader.readAsText(file);
-		    	console.log("readTextFile: " + event.target.result);
+		var reader = new XMLHttpRequest() || new ActiveXObject('MSXML2.XMLHTTP');
+		var response = "";
+		function readTextFile(filePath) {
+		    reader.open('get', filePath, true); 
+		    reader.onreadystatechange = function () {
+		    	if (reader.readyState == 4) {
+		    		response = reader.responseText;
+		    	}
 		    }
+		    reader.send(null);
+		    return response;
 		}
 		
     };
