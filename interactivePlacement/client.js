@@ -156,16 +156,27 @@ window.onload = function() {
 				graphics.clear();
 				drawObjects();
 				graphics.lineStyle(4, 0xff0000, 1);
-				var rawX = game.input.activePointer.worldX;
-				var rawY = game.input.activePointer.worldY;
-				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.x;
-				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT) / game.world.scale.y;
+				var rawX = game.input.activePointer.worldX / game.world.scale.x;
+				var rawY = game.input.activePointer.worldY / game.world.scale.y;
+				var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT);
+				var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT);
 				currentObject.rawWidth = rawX - currentObject.rawX;
 				currentObject.rawHeight = rawY - currentObject.rawY;
 				currentObject.scaledWidth = scaledX - currentObject.scaledX;
 				currentObject.scaledHeight = scaledY - currentObject.scaledY;
 				graphics.drawRect(currentObject.rawX, currentObject.rawY, currentObject.rawWidth, currentObject.rawHeight);
 			}
+
+			// graphics.clear();
+			// 	drawObjects();
+			// 	graphics.lineStyle(4, 0xff0000, 1);
+			// 	x2 = game.input.activePointer.worldX / game.world.scale.x;
+			// 	y2 = game.input.activePointer.worldY / game.world.scale.y;
+			// 	currentObject.width = x2 - currentObject.x;
+			// 	currentObject.height = y2 - currentObject.y;
+			// 	graphics.drawRect(x1, y1, currentObject.width, currentObject.height);
+
+
 			if (game.input.keyboard.isDown(Phaser.KeyCode.ENTER) && !enterPressed) {
 				printAllObjects();
 				enterPressed = true;
