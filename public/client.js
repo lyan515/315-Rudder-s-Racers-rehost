@@ -25,6 +25,8 @@ window.onload = function() {
 		var cooldown = 0;
 		var endText;
 
+		var objectsString = '{ "boundaries" :[{"rawX":97.42857142857137,"rawY":590.2857142857139,"scaledX":1449.3041269841262,"scaledY":8780.82793650793,"rawWidth":29.714285714285694,"rawHeight":128.28571428571422,"scaledWidth":442.0165079365074,"scaledHeight":1908.321269841268},{"rawX":139.42857142857133,"rawY":588.8571428571424,"scaledX":2074.077460317459,"scaledY":8759.577142857137,"rawWidth":55.428571428571416,"rawHeight":129.42857142857144,"scaledWidth":824.5307936507934,"scaledHeight":1925.321904761904}]}';
+
     	var obstacles;
     	var boundaries;
 		function preload () {
@@ -285,36 +287,43 @@ window.onload = function() {
 		}
 
 		function createBoundaries() {
-			// boundaries = game.add.group();
-			// boundaries.enableBody = true;
-			// var boundary = boundaries.create(2900, 14000);
-			// boundary.anchor.setTo(0.5, 0.5);
-			// boundary.width = 1000;
-			// boundary.height = 100;
-			// boundary.body.immovable = true;
+			console.log("create boundaries called");
+			var objects = JSON.parse(objectsString);
+			var boundaryArray = objects.boundaries;
+			boundaries = game.add.group();
+			boundaries.enableBody = true;
+			var boundaryObjects = [];
+			var boundaryObject;
+			for (var i = 0; i < boundaryArray.length; i++) {
+				console.log("creating boundary at: " + boundaryArray[i].scaledX + ", " + boundaryArray[i].scaledY);
+				boundaryObject = boundaries.create(boundaryArray[i].scaledX, boundaryArray[i].scaledY, 'logo');
+				boundaryObject.anchor.setTo(0, 0);
+				boundaryObject.width = boundaryArray[i].scaledWidth;
+				boundaryObject.height = boundaryArray[i].scaledHeight;
+				boundaryObject.body.immovable = true;
+			}
 		}
-
 	
         function create () {
 			// enable Arcade Physics system
 	        game.physics.startSystem(Phaser.Physics.ARCADE);
 
 	        // set world size
-	        game.world.setBounds(0, 0, 23040, 20082);
+	        game.world.setBounds(0, 0, WORLDWIDTH, WORLDHEIGHT);
 
 	        // background (map)
 	        var mapTL = game.add.sprite(0, 0, 'mapTL');
 	        mapTL.anchor.setTo(0, 0);
-	        mapTL.scale.setTo(3, 3);
+	        mapTL.scale.setTo(SCALEFACTOR, SCALEFACTOR);
 	        var mapTR = game.add.sprite(game.world.width / 2, 0, 'mapTR');
 	        mapTR.anchor.setTo(0, 0);
-	        mapTR.scale.setTo(3, 3);
+	        mapTR.scale.setTo(SCALEFACTOR, SCALEFACTOR);
 	        var mapBL = game.add.sprite(0, game.world.height / 2, 'mapBL');
 	        mapBL.anchor.setTo(0, 0);
-	        mapBL.scale.setTo(3, 3);
+	        mapBL.scale.setTo(SCALEFACTOR, SCALEFACTOR);
 	        var mapBR = game.add.sprite(game.world.width / 2, game.world.height / 2, 'mapBR');
 	        mapBR.anchor.setTo(0, 0);
-	        mapBR.scale.setTo(3, 3);
+	        mapBR.scale.setTo(SCALEFACTOR, SCALEFACTOR);
 			
 			//finish line
 			finish = game.add.sprite(3100, 16065, 'finish');
@@ -325,7 +334,7 @@ window.onload = function() {
 	        createArrows();
 
 	        // player
-	        player = game.add.sprite(2900, 16150, 'bluebike');
+	        player = game.add.sprite(1947, 10672, 'bluebike');
 	        player.anchor.setTo(0.5, 0.5);
 		    player.scale.setTo(0.5, 0.5);
 		    player.laps = 0;
@@ -580,6 +589,15 @@ window.onload = function() {
 			}
 
 			return false;
+		}
+
+		function readTextFile(file)
+		{
+		    var reader = new FileReader();
+		    reader.onload = function (event) {
+		    	reader.readAsText(file);
+		    	console.log("readTextFile: " + event.target.result);
+		    }
 		}
 		
     };
