@@ -2,7 +2,7 @@
 var MAPPANELWIDTH = 3840;
 var MAPPANELHEIGHT = 3347;
 // scale factor for game world
-var SCALEFACTOR = 2;
+var SCALEFACTOR = 3;
 // width and height of game world
 //	depend on map panel dimensions and scale factor
 var WORLDWIDTH = MAPPANELWIDTH * 2 * SCALEFACTOR;
@@ -97,6 +97,7 @@ function create () {
 		fill: "#ffffff",
 		align:"left"
 	});
+	toolText.fixedToCamera = true;
 
     // controls
     cursors = game.input.keyboard.createCursorKeys();
@@ -248,12 +249,15 @@ function mouseWheel (event) {
 	// if scrolling up, zoom in
 	if(game.input.mouse.wheelDelta > 0) {
 		game.world.scale.setTo(game.world.scale.x + CAMERAZOOMSPEED, game.world.scale.y + CAMERAZOOMSPEED);
+		toolText.scale.setTo(1 / game.world.scale.x, 1 / game.world.scale.y);
 	}
 	// if scrolling down and you haven't zoomed out all the way, zoom out
 	else if(game.input.mouse.wheelDelta < 0 && game.world.scale.x > 1) {
 		game.world.scale.setTo(game.world.scale.x - CAMERAZOOMSPEED, game.world.scale.y - CAMERAZOOMSPEED);
+		toolText.scale.setTo(1 / game.world.scale.x, 1 / game.world.scale.y);
 		if(game.world.scale.x < 1) {
 			game.world.scale.setTo(1, 1);
+			toolText.scale.setTo(1, 1);
 		}
 	}
 }
