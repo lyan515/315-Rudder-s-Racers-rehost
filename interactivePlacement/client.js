@@ -172,7 +172,7 @@ function update() {
 						break;
 			case 2 : 	// obstacle
 						currentObject = new PlacedObject();
-						currentObject.sprite = game.add.sprite(rawX, rawY, 'trashCan');
+						currentObject.sprite = game.add.sprite(rawX, rawY, 'obstacle');
 						currentObject.rawX = rawX;
 						currentObject.rawY = rawY;
 						currentObject.scaledX = scaledX;
@@ -226,6 +226,7 @@ function update() {
 						currentObject.rawY = rawY;
 						currentObject.scaledX = scaledX;
 						currentObject.scaledY = scaledY;
+						obstacles.push(currentObject);
 						break;
 			case 3 : 	// power-up
 						currentObject.sprite.x = rawX;
@@ -234,6 +235,7 @@ function update() {
 						currentObject.rawY = rawY;
 						currentObject.scaledX = scaledX;
 						currentObject.scaledY = scaledY;
+						powerUps.push(currentObject);
 						break;
 		}
 	}
@@ -299,7 +301,7 @@ function update() {
 						currentObject.sprite.x = rawX;
 						currentObject.sprite.y = rawY;
 						currentObject.rawX = rawX;
-						currentObject.rawY = rawY:
+						currentObject.rawY = rawY;
 						currentObject.scaledX = scaledX;
 						currentObject.scaledY = scaledY;
 						break;
@@ -348,9 +350,17 @@ function printAllObjects () {
 	var result = '{"boundaries":';
 	result += JSON.stringify(boundaries);
 	result += ',"obstacles":';
-	result += JSON.stringify(obstacles);
+	result += JSON.stringify(obstacles, function(key, value) {
+	    if (key !== 'sprite' && value !== null) {
+	    	return value;
+	    }
+	});
 	result += ',"powerUps":';
-	result += JSON.stringify(powerUps);
+	result += JSON.stringify(powerUps, function(key, value) {
+	    if (key !== 'sprite' && value !== null) {
+	    	return value;
+	    }
+	});
 	result += '}';
 	console.log(result);
 }
