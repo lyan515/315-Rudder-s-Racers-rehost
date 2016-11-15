@@ -2,11 +2,14 @@ window.onload = function() {
 
 		var MAPPANELWIDTH = 3840;
 		var MAPPANELHEIGHT = 3347;
-		var SCALEFACTOR = 2;
+		var SCALEFACTOR = 3;
 		var WORLDWIDTH = MAPPANELWIDTH * 2 * SCALEFACTOR;
     	var WORLDHEIGHT = MAPPANELHEIGHT * 2 * SCALEFACTOR;
     	var WINDOWWIDTH = 1280;
     	var WINDOWHEIGHT = 720;
+
+    	var PLAYERSTARTX = 2904;
+    	var PLAYERSTARTY = 16102;
 
         var game = new Phaser.Game(WINDOWWIDTH, WINDOWHEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render});
 
@@ -25,15 +28,13 @@ window.onload = function() {
 		var cooldown = 0;
 		var endText;
 
-		var objectsString = '{ "boundaries" :[{"rawX":97.42857142857137,"rawY":590.2857142857139,"scaledX":1449.3041269841262,"scaledY":8780.82793650793,"rawWidth":29.714285714285694,"rawHeight":128.28571428571422,"scaledWidth":442.0165079365074,"scaledHeight":1908.321269841268},{"rawX":139.42857142857133,"rawY":588.8571428571424,"scaledX":2074.077460317459,"scaledY":8759.577142857137,"rawWidth":55.428571428571416,"rawHeight":129.42857142857144,"scaledWidth":824.5307936507934,"scaledHeight":1925.321904761904}]}';
-
     	var obstacles;
     	var boundaries;
 		function preload () {
-
 			game.load.image('logo', 'phaser.png');
 			game.load.image('bluebike', 'bluebike.png');
 			game.load.image('trashCan', 'trashCan.png');
+			game.load.image('powerUp', 'powerUp.png');
 			game.load.image('arrow', 'arrow.png');
 			// total map size: 7680 x 6694
 			game.load.image('mapTL', 'campusCircuit_TL.png');
@@ -52,6 +53,29 @@ window.onload = function() {
 				'reconnectionDelay': 1000,
 				'reconnectionDelayMax': 5000});
 			setEventHandlers();
+        }
+
+        function createObjects () {
+        	var objectsString = readTextFile("objects.txt");
+			if (!objectsString) {
+				objectsString = readTextFile("objects.txt");
+			}
+			if (!objectsString) {
+				objectsString = readTextFile("objects.txt");
+			}
+			if (objectsString) {
+				console.log("successful reading object file");
+				var objects = JSON.parse(objectsString);
+				var boundaryArray = objects.boundaries;
+				var obstacleArray = objects.obstacles;
+				var powerUpArray = objects.powerUps;
+        		createBoundaries(boundaryArray);
+        		createObstacles(obstacleArray);
+        		createPowerUps(powerUpArray);
+        	}        	
+			else {
+				console.log("error reading object file");
+			}
         }
 
 		function createObs(){
@@ -286,23 +310,44 @@ window.onload = function() {
 	        arrow.angle = 180;
 		}
 
-		function createBoundaries() {
-			var testString = readTextFile("objects.txt");
-			console.log("objects.txt: " + testString);
-			console.log("create boundaries called");
-			var objects = JSON.parse(objectsString);
-			var boundaryArray = objects.boundaries;
+		function createBoundaries (boundaryArray) {
 			boundaries = game.add.group();
 			boundaries.enableBody = true;
 			var boundaryObjects = [];
 			var boundaryObject;
 			for (var i = 0; i < boundaryArray.length; i++) {
 				console.log("creating boundary at: " + boundaryArray[i].scaledX + ", " + boundaryArray[i].scaledY);
-				boundaryObject = boundaries.create(boundaryArray[i].scaledX, boundaryArray[i].scaledY, 'logo');
+				boundaryObject = boundaries.create(boundaryArray[i].scaledX, boundaryArray[i].scaledY);
 				boundaryObject.anchor.setTo(0, 0);
 				boundaryObject.width = boundaryArray[i].scaledWidth;
 				boundaryObject.height = boundaryArray[i].scaledHeight;
 				boundaryObject.body.immovable = true;
+			}
+		}
+
+		function createObstacles (obstacleArray) {
+			obstacles = game.add.group();
+			obstacles.enableBody = true;
+			var obstacleObjects = [];
+			var obstacleObject;
+			for (var i = 0; i < obstacleArray.length; i++) {
+				console.log("creating obstacle at: " + obstacleArray[i].scaledX + ", " + obstacleArray[i].scaledY);
+				obstacleObject = obstacles.create(obstacleArray[i].scaledX, obstacleArray[i].scaledY, 'trashCan');
+				obstacleObject.anchor.setTo(0, 0);
+				obstacleObject.body.immovable = true;
+			}
+		}
+
+		function createPowerUps (powerUpArray) {
+			powerUps = game.add.group();
+			powerUps.enableBody = true;
+			var powerUpObjects = [];
+			var powerUpObject;
+			for (var i = 0; i < powerUpArray.length; i++) {
+				console.log("creating power-up at: " + powerUpArray[i].scaledX + ", " + powerUpArray[i].scaledY);
+				powerUpObject = powerUps.create(powerUpArray[i].scaledX, powerUpArray[i].scaledY, 'powerUp');
+				powerUpObject.anchor.setTo(0, 0);
+				powerUpObject.body.immovable = true;
 			}
 		}
 	
@@ -336,18 +381,15 @@ window.onload = function() {
 	        createArrows();
 
 	        // player
-	        player = game.add.sprite(1947, 10672, 'bluebike');
+	        player = game.add.sprite(PLAYERSTARTX, PLAYERSTARTY, 'bluebike');
 	        player.anchor.setTo(0.5, 0.5);
 		    player.scale.setTo(0.5, 0.5);
 		    player.laps = 0;
 	        game.physics.arcade.enable(player);
 	        player.body.collideWorldBounds = true;
 
-	        // set up obstacles
-			createObs();
-
-			// add boundaries
-			createBoundaries();
+	        // create objects
+	        createObjects();
 			
 	        // set up camera size
 	        game.camera.width = 1280;
@@ -491,10 +533,6 @@ window.onload = function() {
 		}
 		
 		function update() {
-			// player movement
-	        // reset the player's velocity
-			//player.body.velocity.x = 0;
-	        //player.body.velocity.y = 0;
 
 	        if (cursors.up.isDown) {	//forward and backward movement
 				forward();
