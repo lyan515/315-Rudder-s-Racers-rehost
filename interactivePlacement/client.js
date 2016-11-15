@@ -40,7 +40,16 @@ var tooltext;
 
 // stores the currently edited object
 var currentObject;
-var Rectangle = function () {
+var PlacedObject = function () {
+	var sprite;
+	// raw values are for the interactive placement system
+	// scaled values are for the actual game client
+	var rawX = 0;
+	var rawY = 0;
+	var scaledX = 0;
+	var scaledY = 0;
+}
+var Boundary = function () {
 	// raw values are for the interactive placement system
 	// scaled values are for the actual game client
 	var rawX = 0;
@@ -56,6 +65,7 @@ var Rectangle = function () {
 function preload () {
 
 	game.load.image('obstacle', 'trashCan.png');
+	game.load.image('powerUp', 'powerUp.png');
 	// total map size: 7680 x 6694
 	game.load.image('mapTL', 'campusCircuit_TL.png');
 	game.load.image('mapTR', 'campusCircuit_TR.png');
@@ -151,12 +161,33 @@ function update() {
 		var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT);
 		// set leftClicked to true to register only one click
 		leftClicked = true;
-		// create new rectangle object and set initial coordinates
-		currentObject = new Rectangle();
-		currentObject.rawX = rawX;
-		currentObject.rawY = rawY;
-		currentObject.scaledX = scaledX;
-		currentObject.scaledY = scaledY;
+		// create new object based on the tool
+		switch (currentTool) {
+			case 1 : 	// boundary: create new boundary object and set initial coordinates
+						currentObject = new Boundary();
+						currentObject.rawX = rawX;
+						currentObject.rawY = rawY;
+						currentObject.scaledX = scaledX;
+						currentObject.scaledY = scaledY;
+						break;
+			case 2 : 	// obstacle
+						currentObject = new PlacedObject();
+						currentObject.sprite = game.add.sprite(rawX, rawY, 'trashCan');
+						currentObject.rawX = rawX;
+						currentObject.rawY = rawY;
+						currentObject.scaledX = scaledX;
+						currentObject.scaledY = scaledY;
+						break;
+			case 3 : 	// power-up
+						currentObject = new PlacedObject();
+						currentObject.sprite = game.add.sprite(rawX, rawY, 'powerUp');
+						currentObject.rawX = rawX;
+						currentObject.rawY = rawY;
+						currentObject.scaledX = scaledX;
+						currentObject.scaledY = scaledY;
+						break;
+		}
+		
 	}
 	// handle left click being released
 	else if (game.input.activePointer.leftButton.isUp && leftClicked) {
@@ -168,22 +199,43 @@ function update() {
 		var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT);
 		// set leftClicked to false to allow another click
 		leftClicked = false;
-		// if width or height are negative, adjust value of coordinate and
-		//	flip sign of width/height
-		if (currentObject.rawWidth < 0) {
-			currentObject.rawX = currentObject.rawX + currentObject.rawWidth;
-			currentObject.scaledX = currentObject.scaledX + currentObject.scaledWidth;
-			currentObject.rawWidth *= -1;
-			currentObject.scaledWidth *= -1;
+		// place new object based on current tool
+		switch (currentTool) {
+			case 1 : 	// boundary
+						// if width or height are negative, adjust value of coordinate and
+						//	flip sign of width/height
+						if (currentObject.rawWidth < 0) {
+							currentObject.rawX = currentObject.rawX + currentObject.rawWidth;
+							currentObject.scaledX = currentObject.scaledX + currentObject.scaledWidth;
+							currentObject.rawWidth *= -1;
+							currentObject.scaledWidth *= -1;
+						}
+						if (currentObject.rawHeight < 0) {
+							currentObject.rawY = currentObject.rawY + currentObject.rawHeight;
+							currentObject.scaledY = currentObject.scaledY + currentObject.scaledHeight;
+							currentObject.rawHeight *= -1;
+							currentObject.scaledHeight *= -1;
+						}
+						// add the new boundary to the array
+						boundaries.push(currentObject);
+						break;
+			case 2 : 	// obstacle
+						currentObject.sprite.x = rawX;
+						currentObject.sprite.y = rawY;
+						currentObject.rawX = rawX;
+						currentObject.rawY = rawY;
+						currentObject.scaledX = scaledX;
+						currentObject.scaledY = scaledY;
+						break;
+			case 3 : 	// power-up
+						currentObject.sprite.x = rawX;
+						currentObject.sprite.y = rawY;
+						currentObject.rawX = rawX;
+						currentObject.rawY = rawY;
+						currentObject.scaledX = scaledX;
+						currentObject.scaledY = scaledY;
+						break;
 		}
-		if (currentObject.rawHeight < 0) {
-			currentObject.rawY = currentObject.rawY + currentObject.rawHeight;
-			currentObject.scaledY = currentObject.scaledY + currentObject.scaledHeight;
-			currentObject.rawHeight *= -1;
-			currentObject.scaledHeight *= -1;
-		}
-		// add the new rectangle to the array
-		boundaries.push(currentObject);
 	}
 
 	// handle right clicks
@@ -191,10 +243,26 @@ function update() {
 		rightClicked = true;
 		// clear screen
 		graphics.clear();
-		// delete last object in array
-		if (boundaries.length > 0) {
-			boundaries.splice(boundaries.length - 1);
+		// delete object based on current tool
+		switch (currentTool) {
+			case 1 : 	// boundary
+						if (boundaries.length > 0) {
+							boundaries.splice(boundaries.length - 1);
+						}
+						break;
+			case 2 : 	// obstacle
+						if (obstacles.length > 0) {
+							obstacles.splice(obstacles.length - 1);
+						}
+						break;
+			case 3 : 	// power-up
+						if (powerUps.length > 0) {
+							powerUps.splice(powerUps.length - 1);
+						}
+						break;
+
 		}
+		
 		// redraw objects
 		drawObjects();
 	}
@@ -216,13 +284,26 @@ function update() {
 		// convert to scaled coordinates
 		var scaledX = rawX * (WORLDHEIGHT / WINDOWHEIGHT);
 		var scaledY = rawY * (WORLDHEIGHT / WINDOWHEIGHT);
-		// set currentObjects values
-		currentObject.rawWidth = rawX - currentObject.rawX;
-		currentObject.rawHeight = rawY - currentObject.rawY;
-		currentObject.scaledWidth = scaledX - currentObject.scaledX;
-		currentObject.scaledHeight = scaledY - currentObject.scaledY;
-		// draw currentObject
-		graphics.drawRect(currentObject.rawX, currentObject.rawY, currentObject.rawWidth, currentObject.rawHeight);
+		// update new object based on current tool
+		switch (currentTool) {
+			case 1 : 	// set boundary values
+						currentObject.rawWidth = rawX - currentObject.rawX;
+						currentObject.rawHeight = rawY - currentObject.rawY;
+						currentObject.scaledWidth = scaledX - currentObject.scaledX;
+						currentObject.scaledHeight = scaledY - currentObject.scaledY;
+						// draw currentObject
+						graphics.drawRect(currentObject.rawX, currentObject.rawY, currentObject.rawWidth, currentObject.rawHeight);
+						break;
+			case 2 : 	
+			case 3 : 	// obstacle or power-up
+						currentObject.sprite.x = rawX;
+						currentObject.sprite.y = rawY;
+						currentObject.rawX = rawX;
+						currentObject.rawY = rawY:
+						currentObject.scaledX = scaledX;
+						currentObject.scaledY = scaledY;
+						break;
+		}
 	}
 
 	// handle enter pressed
@@ -266,7 +347,11 @@ function mouseWheel (event) {
 function printAllObjects () {
 	var result = '{"boundaries":';
 	result += JSON.stringify(boundaries);
-	result += "}";
+	result += ',"obstacles":';
+	result += JSON.stringify(obstacles);
+	result += ',"powerUps":';
+	result += JSON.stringify(powerUps);
+	result += '}';
 	console.log(result);
 }
 
