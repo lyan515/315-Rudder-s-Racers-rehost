@@ -3,6 +3,7 @@ var MAPPANELWIDTH = 3840;
 var MAPPANELHEIGHT = 3347;
 // scale factor for game world
 var SCALEFACTOR = 3;
+var PLACEDOBJECTSCALEFACTOR = 0.5;
 // width and height of game world
 //	depend on map panel dimensions and scale factor
 var WORLDWIDTH = MAPPANELWIDTH * 2 * SCALEFACTOR;
@@ -173,6 +174,8 @@ function update() {
 			case 2 : 	// obstacle
 						currentObject = new PlacedObject();
 						currentObject.sprite = game.add.sprite(rawX, rawY, 'obstacle');
+						currentObject.sprite.scale.setTo(WINDOWHEIGHT / (WORLDHEIGHT / SCALEFACTOR) * PLACEDOBJECTSCALEFACTOR,
+							WINDOWHEIGHT / (WORLDHEIGHT / SCALEFACTOR) * PLACEDOBJECTSCALEFACTOR);
 						currentObject.rawX = rawX;
 						currentObject.rawY = rawY;
 						currentObject.scaledX = scaledX;
@@ -181,6 +184,8 @@ function update() {
 			case 3 : 	// power-up
 						currentObject = new PlacedObject();
 						currentObject.sprite = game.add.sprite(rawX, rawY, 'powerUp');
+						currentObject.sprite.scale.setTo(WINDOWHEIGHT / (WORLDHEIGHT / SCALEFACTOR) * PLACEDOBJECTSCALEFACTOR,
+							WINDOWHEIGHT / (WORLDHEIGHT / SCALEFACTOR) * PLACEDOBJECTSCALEFACTOR);
 						currentObject.rawX = rawX;
 						currentObject.rawY = rawY;
 						currentObject.scaledX = scaledX;
