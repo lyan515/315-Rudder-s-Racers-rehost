@@ -254,11 +254,13 @@ function update() {
 						break;
 			case 2 : 	// obstacle
 						if (obstacles.length > 0) {
+							obstacles[obstacles.length - 1].sprite.destroy();
 							obstacles.splice(obstacles.length - 1);
 						}
 						break;
 			case 3 : 	// power-up
 						if (powerUps.length > 0) {
+							powerUps[powerUps.length - 1].sprite.destroy();
 							powerUps.splice(powerUps.length - 1);
 						}
 						break;
