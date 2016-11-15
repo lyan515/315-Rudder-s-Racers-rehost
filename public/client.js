@@ -312,6 +312,7 @@ window.onload = function() {
 		    player.laps = 0;
 	        game.physics.arcade.enable(player);
 	        player.body.collideWorldBounds = true;
+           	player.body.bounce.setTo(5, 5); //lower numbers mean less bounce 
 
 	        // set up obstacles
 			createObs();
@@ -524,6 +525,7 @@ window.onload = function() {
 			
 			if(hitObstacle == true){
 				speed = 0;
+				//if the obstacle is a map/path boundary, should their speed still drop to 0?
 			}
 			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle, laps: player.laps});
 		}
