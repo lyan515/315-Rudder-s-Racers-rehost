@@ -3,7 +3,7 @@ window.onload = function() {
         var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update});
 
 		var socket;
-		var otherPlayers;
+		var otherPlayers = [];
         var player;
 
 		var angle = 0;
@@ -32,15 +32,14 @@ window.onload = function() {
 			
 			game.load.image('finish', 'finishline.png');
 			
-			otherPlayers = [];	//hold list of other players connected
-			create();			//load all of the objects onto the screen
+			//otherPlayers = [];	//hold list of other players connected
 			
+			//load all of the objects onto the screen
 			//create soccket connection
-			socket = io.connect({
-				'reconnection': true,
-				'reconnectionDelay': 1000,
-				'reconnectionDelayMax': 5000});
-			setEventHandlers();
+			
+			
+			
+
         }
 
 		function createObs(){
@@ -277,6 +276,8 @@ window.onload = function() {
 
 	
         function create () {				
+        	console.log("create");
+			socket = io.connect();
 			// enable Arcade Physics system
 	        game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -330,7 +331,10 @@ window.onload = function() {
 						align: "center"
 			});
 			endText.anchor.setTo(0.5, 0.5);
-
+			setEventHandlers();
+			 console.log("sendPlayers");
+			socket.emit('sendPlayers', {id: player.id});
+			
         }
 
         function toDegrees (angle) {
@@ -376,38 +380,38 @@ window.onload = function() {
 		}
 		
 		var setEventHandlers = function() {//set all of the callback functions for socket events
-			socket.on('connect', onSocketConnected);//new connection
 			
+			console.log("setEventHandlers");
 			socket.on('newPlayer', onNewPlayer);//new player
-			
+			socket.on('connect', onSocketConnected);//new connection
 			socket.on('movePlayer', onMovePlayer);//send a new id to the new player
 			socket.on('disconnect', onSocketDisconnect);//one of the players has moved
 			socket.on('removePlayer', onRemovePlayer);//player disconnected
 			socket.on('playerID', function(data) {
 				player.id = data.id;
 				player.playerNum = data.playerNum;
-				player.x += (player.playerNum*35); 
+				player.x += (player.playerNum*35);
 			});
 			socket.on('gameFinish', onGameFinish);//remove player from game
-
+			
 		}
 		
 		function onSocketConnected() {
 			console.log('Connected to socket server');
 			
 			socket.emit('newPlayer', { x: player.x, y: player.y, angle: player.angle });	//send server info to create new player
-	
+			
 		}
 
 		function onSocketDisconnect () {
  			console.log('Disconnected from socket server');
 		}
 		
-		function setPlayerId(data) {
-			player.id = data.id;
-			player.playerNum = data.playerNum;	//index in the servers player list
-			player.x += (player.playerNum*35);	//set starting position based on how many people are connected
-		}
+		// function setPlayerId(data) {
+		// 	player.id = data.id;
+		// 	player.playerNum = data.playerNum;	//index in the servers player list
+		// 	player.x += (player.playerNum*35);	//set starting position based on how many people are connected
+		// }
 		
 		function onNewPlayer (data) {
 			console.log('New player connected:', data.id);
@@ -424,6 +428,7 @@ window.onload = function() {
 			
 			// Add new player to the remote players array
 			otherPlayers.push(new OtherPlayer(data.id, game, player, data.playerNum, data.x, data.y, data.angle));	//create new player and put it into list of current players
+			
 			console.log(otherPlayers);	//debugging
 		}
 		
@@ -459,9 +464,6 @@ window.onload = function() {
 		
 		function update() {
 			// player movement
-	        // reset the player's velocity
-			//player.body.velocity.x = 0;
-	        //player.body.velocity.y = 0;
 
 	        if (cursors.up.isDown) {	//forward and backward movement
 				forward();
