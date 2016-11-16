@@ -283,7 +283,7 @@ window.onload = function() {
 
 	        // set world size
 	        game.world.setBounds(0, 0, 23040, 20082);
-
+		game.desiredFps = 40;
 	        // background (map)
 	        var mapTL = game.add.sprite(0, 0, 'mapTL');
 	        mapTL.anchor.setTo(0, 0);
