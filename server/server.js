@@ -19,10 +19,10 @@ app.get('/*', function(request, response){
     console.log('request starting...');
 
     var filePath = __dirname + '/..' +request.url;
-    console.log("Path: " + filePath);
+    //console.log("Path: " + filePath);
     if (filePath == __dirname)
         filePath = __dirname + '/../public/index.html';
-    console.log("Path: " + filePath);
+    //console.log("Path: " + filePath);
     var extname = path.extname(filePath);
     var contentType = 'text/html';
     
@@ -91,15 +91,25 @@ var setEventHandlers = function() {
 };
 
 function onSocketConnection(client) {
-
+    console.log("onSocketConnection");
     client.on('newPlayer', onNewPlayer);//listen for new player
     client.on('movePlayer', onMovePlayer);//update a players location
     client.on('disconnect', onClientDisconnect);//a player disconnected
-	client.on('gameWin', onGameWin);   
+	client.on('gameWin', onGameWin);  
+    client.on('sendPlayers', function(data) {
+        console.log("sendPlayers");
+        var i, existingPlayer;
+        for (i = 0; i < players.length; i++) {
+            existingPlayer = players[i]
+            if(existingPlayer.id != data.id)
+                this.emit('newPlayer', {id: existingPlayer.id, playerNum: existingPlayer.playerNum, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle()});
+        }
+    }); 
 };
 
 function onNewPlayer(data) {
 	console.log('Player connected: ' + this.id);
+    
     var newPlayer = new Player(data.x, data.y, data.angle);	//create the new player
     newPlayer.id = this.id;		//set the player id to the same as the socket id since it is unique enough for our purposes
 	newPlayer.playerNum = players.length;	//set the players number to its new index
@@ -108,11 +118,7 @@ function onNewPlayer(data) {
     this.broadcast.emit('newPlayer', {id: newPlayer.id, playerNum: newPlayer.playerNum, x: newPlayer.getX(), y: newPlayer.getY(), angle: newPlayer.getAngle()});	//send the new players info to everyone else
 		
     //send all of the currently connected players back to the new player
-	var i, existingPlayer;
-    for (i = 0; i < players.length; i++) {
-        existingPlayer = players[i]
-        this.emit('newPlayer', {id: existingPlayer.id, playerNum: newPlayer.playerNum, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle()});
-    }
+	
     
     players.push(newPlayer);	//insert new player into servers list of players
 }

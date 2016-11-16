@@ -4,17 +4,20 @@ var OtherPlayer = function(id, game, player, playerNum, startX, startY, startAng
 	var x = startX;
 	var y = startY;
 	var angle = startAngle;
-
-	this.game = game;
 	this.player = player;
-	
-	this.player = game.add.sprite(x+playerNum*35, y+playerNum, 'bluebike');		//add sprite to game in starting position based on its number
-	this.player.id = id.toString();	
+	this.game = game;
 
+	this.alive = true;
+	
+	
+	this.player = game.add.sprite(x+playerNum*35, y, 'bluebike');		//add sprite to game in starting position based on its number
+	this.player.id = id.toString();	
+	game.physics.enable(this.player, Phaser.Physics.ARCADE)
 	this.player.anchor.setTo(0.5, 0.5);
 	this.player.scale.setTo(0.5, 0.5);
 	this.player.angle = angle;
 	this.lastPosition = { x: x, y: y, angle: angle };	//store where it last was when updated
+	this.player.bringToTop();
 }
 
 OtherPlayer.prototype.update = function() {			//function to update the stored location
