@@ -13,7 +13,7 @@ var WINDOWHEIGHT = 900;
 
 // scroll and zoom speed of camera
 var CAMERASCROLLSPEED = 10;
-var CAMERAZOOMSPEED = 0.1;
+var CAMERAZOOMSPEED = 0.2;
 
 // create Phaser game instance
 var game = new Phaser.Game(WINDOWHEIGHT * (WORLDWIDTH / WORLDHEIGHT), WINDOWHEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update});
@@ -194,6 +194,7 @@ function update() {
 		}
 		
 	}
+
 	// handle left click being released
 	else if (game.input.activePointer.leftButton.isUp && leftClicked) {
 		// get raw coordinates

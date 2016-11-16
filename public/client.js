@@ -17,6 +17,7 @@ window.onload = function() {
 		var otherPlayers;
         var player;
 
+        // player attributes
 		var angle = 0;
     	var cursors;
     	var speed = 0;
@@ -26,10 +27,20 @@ window.onload = function() {
     	var reversing = false;
     	var turnSpeed = 0.05;
 		var cooldown = 0;
+
+		// UI attributes
 		var endText;
 
+		// world attributes
     	var obstacles;
     	var boundaries;
+
+    	// physics attributes
+    	// create collision groups
+        var playerCollisionGroup;
+        var boundaryCollisionGroup;
+        var obstacleCollisionGroup;
+
 		function preload () {
 			game.load.image('logo', 'phaser.png');
 			game.load.image('bluebike', 'bluebike.png');
@@ -311,36 +322,36 @@ window.onload = function() {
 		}
 
 		function createBoundaries (boundaryArray) {
-			boundaries = game.add.group();
-			boundaries.enableBody = true;
 			var boundaryObjects = [];
 			var boundaryObject;
 			for (var i = 0; i < boundaryArray.length; i++) {
 				console.log("creating boundary at: " + boundaryArray[i].scaledX + ", " + boundaryArray[i].scaledY);
-				boundaryObject = boundaries.create(boundaryArray[i].scaledX, boundaryArray[i].scaledY);
-				boundaryObject.anchor.setTo(0, 0);
+				boundaryObject = boundaries.create(boundaryArray[i].scaledX, boundaryArray[i].scaledY, 'logo');
 				boundaryObject.width = boundaryArray[i].scaledWidth;
-				boundaryObject.height = boundaryArray[i].scaledHeight;
-				boundaryObject.body.immovable = true;
+				boundaryObject.height = boundaryArray[i].scaledHeight;				
+				boundaryObject.anchor.setTo(0, 0);
+				boundaryObject.body.setRectangle(boundaryArray[i].scaledWidth, boundaryArray[i].scaledHeight, boundaryArray[i].scaledWidth / 2, boundaryArray[i].scaledHeight / 2);
+				boundaryObject.body.static = true;
+				boundaryObject.body.setCollisionGroup(boundaryCollisionGroup);
+				boundaryObject.body.collides(playerCollisionGroup);
 			}
 		}
 
 		function createObstacles (obstacleArray) {
-			obstacles = game.add.group();
-			obstacles.enableBody = true;
 			var obstacleObjects = [];
 			var obstacleObject;
 			for (var i = 0; i < obstacleArray.length; i++) {
 				console.log("creating obstacle at: " + obstacleArray[i].scaledX + ", " + obstacleArray[i].scaledY);
 				obstacleObject = obstacles.create(obstacleArray[i].scaledX, obstacleArray[i].scaledY, 'trashCan');
 				obstacleObject.anchor.setTo(0, 0);
-				obstacleObject.body.immovable = true;
+				obstacleObject.body.setRectangleFromSprite(obstacleObject.sprite);
+				obstacleObject.body.static = true;
+				obstacleObject.body.setCollisionGroup(obstacleCollisionGroup);
+				obstacleObject.body.collides(playerCollisionGroup);
 			}
 		}
 
 		function createPowerUps (powerUpArray) {
-			powerUps = game.add.group();
-			powerUps.enableBody = true;
 			var powerUpObjects = [];
 			var powerUpObject;
 			for (var i = 0; i < powerUpArray.length; i++) {
@@ -352,8 +363,18 @@ window.onload = function() {
 		}
 	
         function create () {
-			// enable Arcade Physics system
-	        game.physics.startSystem(Phaser.Physics.ARCADE);
+			// enable P2 Physics system
+	        game.physics.startSystem(Phaser.Physics.P2JS);
+	        // turn on collisions
+	        game.physics.p2.setImpactEvents(true);
+	        game.physics.p2.restitution = 0.8;
+
+	        // set objects to collide with world bounds
+	        game.physics.p2.updateBoundsCollisionGroup();
+
+	        playerCollisionGroup = game.physics.p2.createCollisionGroup();
+        	boundaryCollisionGroup = game.physics.p2.createCollisionGroup();
+        	obstacleCollisionGroup = game.physics.p2.createCollisionGroup();
 
 	        // set world size
 	        game.world.setBounds(0, 0, WORLDWIDTH, WORLDHEIGHT);
@@ -385,8 +406,23 @@ window.onload = function() {
 	        player.anchor.setTo(0.5, 0.5);
 		    player.scale.setTo(0.5, 0.5);
 		    player.laps = 0;
-	        game.physics.arcade.enable(player);
-	        player.body.collideWorldBounds = true;
+	        game.physics.p2.enable(player);
+	        player.body.setCollisionGroup(playerCollisionGroup);
+	        player.body.collides([boundaryCollisionGroup, obstacleCollisionGroup]);
+	        player.body.fixedRotation = true;
+	        //player.body.collideWorldBounds = true;
+	        console.log(player.body.debug);
+
+	        // set up objects physics	        
+			boundaries = game.add.group();			
+			obstacles = game.add.group();			
+			powerUps = game.add.group();
+	        boundaries.enableBody = true;
+	        obstacles.enableBody = true;
+	        powerUps.enableBody = true;
+	        boundaries.physicsBodyType = Phaser.Physics.P2JS;
+	        obstacles.physicsBodyType = Phaser.Physics.P2JS;
+	        powerUps.physicsBodyType = Phaser.Physics.P2JS;
 
 	        // create objects
 	        createObjects();
@@ -534,6 +570,8 @@ window.onload = function() {
 		
 		function update() {
 
+			// player controls
+
 	        if (cursors.up.isDown) {	//forward and backward movement
 				forward();
 				reversing = false;
@@ -590,19 +628,20 @@ window.onload = function() {
 			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
 	
 	        // check for collisions
-	        //var hitArrows = game.physics.arcade.collide(player, arrow);
-			var hitObstacle = game.physics.arcade.collide(player, obstacles);
+	        //var hitArrows = game.physics.p2.collide(player, arrow);
+			//var hitObstacle = game.physics.p2.collide(player, obstacles);
 
-			var hitBoundaries = game.physics.arcade.collide(player, boundaries);
+			//var hitBoundaries = game.physics.p2.collide(player, boundaries);
 			
-			if(hitObstacle == true){
-				speed = 0;
-			}
+			// if(hitObstacle == true){
+			// 	speed = 0;
+			// }
 			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle, laps: player.laps});
 		}
 
 		function render () {
 			game.debug.spriteInfo(player, 32, 32);
+			game.debug.body(player);
 		}
 
 		function onRemovePlayer (data) {					//remove player from client screen
