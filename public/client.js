@@ -15,6 +15,7 @@ window.onload = function() {
     	var reversing = false;
     	var turnSpeed = 0.05;
 		var cooldown = 0;
+		var gotPow = 0;
 		var endText;
 
     	var obstacles;
@@ -31,6 +32,7 @@ window.onload = function() {
 			game.load.image('mapBR', 'campusCircuit_BR.png');
 			
 			game.load.image('finish', 'finishline.png');
+			game.load.image('powUp', 'pow.png');
 			
 			//otherPlayers = [];	//hold list of other players connected
 			
@@ -283,7 +285,7 @@ window.onload = function() {
 
 	        // set world size
 	        game.world.setBounds(0, 0, 23040, 20082);
-		game.desiredFps = 40;
+			game.desiredFps = 40;
 	        // background (map)
 	        var mapTL = game.add.sprite(0, 0, 'mapTL');
 	        mapTL.anchor.setTo(0, 0);
@@ -318,9 +320,14 @@ window.onload = function() {
 	        // set up obstacles
 			createObs();
 			
+			// set up powerup
+			powerUp = game.add.sprite(2900, 15000, 'powUp');
+			powerUp.scale.setTo(0.25, 0.25);
+			
 	        // set up camera size
 	        game.camera.width = 1280;
 	        game.camera.height = 720;
+			
 
 	        // controls
 	        cursors = game.input.keyboard.createCursorKeys();
@@ -463,6 +470,15 @@ window.onload = function() {
 
 		}
 		
+		function getPowerUp(){
+			if(gotPow == 0){
+				game.debug.text("Got Power Up!!!", 32, 64);
+				powerUp.kill();
+				gotPow = 1;
+			}
+			//powerUp.destroy();
+		}
+		
 		function update() {
 			// player movement
 
@@ -520,6 +536,11 @@ window.onload = function() {
 			}
 			cooldown--;//decrement cooldown
 			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
+			
+			if (checkOverlap(player, powerUp)==true)
+			{
+				getPowerUp();
+			}
 	
 	        // check for collisions
 	        //var hitArrows = game.physics.arcade.collide(player, arrow);
