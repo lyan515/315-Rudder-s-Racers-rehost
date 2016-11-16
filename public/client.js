@@ -29,6 +29,7 @@ window.onload = function() {
 			game.load.image('mapTR', 'campusCircuit_TR.png');
 			game.load.image('mapBL', 'campusCircuit_BL.png');
 			game.load.image('mapBR', 'campusCircuit_BR.png');
+			game.load.image('powUp', 'pow.png');
 			
 			game.load.image('finish', 'finishline.png');
 			
@@ -313,6 +314,10 @@ window.onload = function() {
 	        game.physics.arcade.enable(player);
 	        player.body.collideWorldBounds = true;
            	player.body.bounce.setTo(5, 5); //lower numbers mean less bounce 
+			
+			//powerup test
+			powerUp = game.add.sprite(2900, 16000, 'powUp');
+			powerUp.scale.setTo(0.25, 0.25);
 
 	        // set up obstacles
 			createObs();
@@ -458,6 +463,11 @@ window.onload = function() {
 
 		}
 		
+		function getPowerUp(){
+			game.debug.text("Got Power Up!!!", 32, 64);
+			//powerUp.destroy();
+		}
+		
 		function update() {
 			// player movement
 	        // reset the player's velocity
@@ -506,6 +516,12 @@ window.onload = function() {
 			endText.x = player.x;
 			endText.y = player.y;
 			
+			if (checkOverlap(player, powerUp))
+			{
+				getPowerUp();
+			}
+			
+			
 			//check for finish line
 			if (checkOverlap(player, finish)&& cooldown < 0)
 			{
@@ -520,12 +536,10 @@ window.onload = function() {
 			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
 	
 	        // check for collisions
-	        //var hitArrows = game.physics.arcade.collide(player, arrow);
 			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			
 			if(hitObstacle == true){
 				speed = 0;
-				//if the obstacle is a map/path boundary, should their speed still drop to 0?
 			}
 			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle, laps: player.laps});
 		}
