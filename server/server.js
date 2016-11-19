@@ -46,6 +46,9 @@ app.get('/*', function(request, response){
         case '.wav':
             contentType = 'audio/wav';
             break;
+        case '.txt':
+            contentType = 'text/plain';
+            break;
     }
 
     fs.readFile(filePath, function(error, content) {
