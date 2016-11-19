@@ -1,18 +1,23 @@
+//Some ideas on how to run a game server taken from:
+//https://github.com/xicombd/phaser-multiplayer-game
+
 //stores all the info needed for the client to display the other players that are connected
 
 var OtherPlayer = function(id, game, player, playerNum, startX, startY, startAngle) {
+	//initialize the other player
 	var x = startX;
 	var y = startY;
 	var angle = startAngle;
 	this.player = player;
 	this.game = game;
 
-	this.alive = true;
-	
-	
+	this.alive = true;	
+		
 	this.player = game.add.sprite(x+playerNum*35, y, 'bluebike');		//add sprite to game in starting position based on its number
 	this.player.id = id.toString();	
+	
 	game.physics.enable(this.player, Phaser.Physics.ARCADE)
+	
 	this.player.anchor.setTo(0.5, 0.5);
 	this.player.scale.setTo(0.5, 0.5);
 	this.player.angle = angle;
