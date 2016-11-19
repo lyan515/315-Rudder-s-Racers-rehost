@@ -11,7 +11,7 @@ window.onload = function() {
     	var PLAYERSTARTX = 2904;
     	var PLAYERSTARTY = 16102;
 
-        var game = new Phaser.Game(WINDOWWIDTH, WINDOWHEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render});
+        var game = new Phaser.Game(WINDOWWIDTH, WINDOWHEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update});
 
 		var socket;
 		var otherPlayers;
