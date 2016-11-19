@@ -14,7 +14,7 @@ window.onload = function() {
         var game = new Phaser.Game(WINDOWWIDTH, WINDOWHEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update});
 
 		var socket;
-		var otherPlayers;
+		var otherPlayers = [];
         var player;
 
 		var angle = 0;
@@ -27,35 +27,27 @@ window.onload = function() {
     	var turnSpeed = 0.05;
 		var cooldown = 0;
 		var endText;
+		var gotPow = 0;
 
     	var obstacles;
     	var boundaries;
-		function preload () {
-			game.load.image('logo', 'phaser.png');
-			game.load.image('bluebike', 'bluebike.png');
-			game.load.image('trashCan', 'trashCan.png');
-			game.load.image('powerUp', 'powerUp.png');
-			game.load.image('arrow', 'arrow.png');
+
+    	function preload () {	//load in map and sprites
+			game.load.image('bluebike', 'bluebike.png');		//sprite of player
+			game.load.image('trashCan', 'trashCan.png');		//sprite of trash can obstacle
+			game.load.image('arrow', 'arrow.png');				//sprite of arrow used to direct players
 			// total map size: 7680 x 6694
-			game.load.image('mapTL', 'campusCircuit_TL.png');
-			game.load.image('mapTR', 'campusCircuit_TR.png');
-			game.load.image('mapBL', 'campusCircuit_BL.png');
-			game.load.image('mapBR', 'campusCircuit_BR.png');
+			game.load.image('mapTL', 'campusCircuit_TL.png');	//top left of map
+			game.load.image('mapTR', 'campusCircuit_TR.png');	//top right of map
+			game.load.image('mapBL', 'campusCircuit_BL.png');	//bottom left of map
+			game.load.image('mapBR', 'campusCircuit_BR.png');	//bottom right of map\
+			game.load.image('powerUp', 'pow.png');
 			
-			game.load.image('finish', 'finishline.png');
-			
-			otherPlayers = [];	//hold list of other players connected
-			create();			//load all of the objects onto the screen
-			
-			//create soccket connection
-			socket = io.connect({
-				'reconnection': true,
-				'reconnectionDelay': 1000,
-				'reconnectionDelayMax': 5000});
-			setEventHandlers();
+			game.load.image('finish', 'finishline.png');		//finish line
         }
 
         function createObjects () {
+        	console.log("createObjects called");
         	var objectsString = readTextFile("objects.txt");
 			if (!objectsString) {
 				objectsString = readTextFile("objects.txt");
@@ -76,9 +68,10 @@ window.onload = function() {
 			else {
 				console.log("error reading object file");
 			}
-        }
+		}
+		
 
-		function createObs(){
+		function createObs(){	//terrible way of loading in all of the obstacles into the game
 			obstacles = game.add.group();
 			obstacles.enableBody = true;
 			var staticObstacle1 = obstacles.create(3072, 15052, 'trashCan');
@@ -183,7 +176,7 @@ window.onload = function() {
 			staticObstacle27.body.immovable = true;
 		}
 		
-		function createArrows(){
+		function createArrows(){	//terrible way of loading in all of the arrows into the game
 			var arrow = game.add.sprite(2856, 16022, 'arrow');
 	        arrow.anchor.setTo(0.5, 0.5);
 	        arrow.scale.setTo(0.1, 0.1);
@@ -351,14 +344,17 @@ window.onload = function() {
 			}
 		}
 	
-        function create () {
+        function create () {		//initialize game as it loads	
+        	console.log("create");
+			socket = io.connect();	//set up connection with the server
+			
 			// enable Arcade Physics system
 	        game.physics.startSystem(Phaser.Physics.ARCADE);
 
 	        // set world size
 	        game.world.setBounds(0, 0, WORLDWIDTH, WORLDHEIGHT);
 
-	        // background (map)
+	        // load in background (map)
 	        var mapTL = game.add.sprite(0, 0, 'mapTL');
 	        mapTL.anchor.setTo(0, 0);
 	        mapTL.scale.setTo(SCALEFACTOR, SCALEFACTOR);
@@ -372,12 +368,11 @@ window.onload = function() {
 	        mapBR.anchor.setTo(0, 0);
 	        mapBR.scale.setTo(SCALEFACTOR, SCALEFACTOR);
 			
-			//finish line
+			//load in finish line
 			finish = game.add.sprite(3100, 16065, 'finish');
 			finish.scale.setTo(0.25, .75);
 
-	        // add arrows
-
+	        // load in arrows
 	        createArrows();
 
 	        // player
@@ -392,31 +387,35 @@ window.onload = function() {
 	        createObjects();
 			
 			// set up powerup
-			powerUp = game.add.sprite(2900, 15000, 'powUp');
+			powerUp = game.add.sprite(2900, 15000, 'powerUp');
 			powerUp.scale.setTo(0.25, 0.25);
+
+	        //load in obstacles
+			createObs();
 			
 	        // set up camera size
-	        game.camera.width = 1280;
-	        game.camera.height = 720;
-			
+	        game.camera.width = WINDOWWIDTH;
+	        game.camera.height = WINDOWHEIGHT;			
 
 	        // controls
 	        cursors = game.input.keyboard.createCursorKeys();
 			
-			//endText
+			// endText that gets changed when player wins or loses
 			endText = game.add.text(player.x, player.y, "", {
 						font: "65px Arial",
 						fill: "#ff0044",
 						align: "center"
 			});
 			endText.anchor.setTo(0.5, 0.5);
-			setEventHandlers();
-			 console.log("sendPlayers");
+			
+			
+			setEventHandlers();				//initialize event handlers
+			console.log("sendPlayers");		//tell server that you are ready to recieve the other players connected
 			socket.emit('sendPlayers', {id: player.id});
 			
         }
 
-        function toDegrees (angle) {
+        function toDegrees (angle) {		//converts an angle to degrees
         	return angle * (180 / Math.PI);
 	    }
 		
@@ -432,7 +431,7 @@ window.onload = function() {
 			}
 		}
 
-		function reverse() {	//reverse function
+		function reverse() {		//reverse function
 			if (speed > 0) {		// if going forward, brake and reverse
 				speed -= (acceleration + braking);
 			}
@@ -730,6 +729,19 @@ window.onload = function() {
 			}
 
 			return false;
+		}
+
+		var reader = new XMLHttpRequest() || new ActiveXObject('MSXML2.XMLHTTP');
+		var response = "";
+		function readTextFile(filePath) {
+		    reader.open('get', filePath, true); 
+		    reader.onreadystatechange = function () {
+		    	if (reader.readyState == 4) {
+		    		response = reader.responseText;
+		    	}
+		    }
+		    reader.send(null);
+		    return response;
 		}
 		
     };
