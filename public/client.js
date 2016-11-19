@@ -1,3 +1,6 @@
+//Some ideas on how to run a game server taken from:
+//https://github.com/xicombd/phaser-multiplayer-game
+
 window.onload = function() {
 
         var game = new Phaser.Game(1280, 720, Phaser.AUTO, '', { preload: preload, create: create, update: update});
@@ -332,11 +335,11 @@ window.onload = function() {
         	return angle * (180 / Math.PI);
 	    }
 		
-		function forward() {		//forward function
-			if (speed < 0) {		// if going backwards, brake and move forward
+		function forward() {						//forward function
+			if (speed < 0) {						// if going backwards, brake and move forward
 				speed += (acceleration + braking);
 			}
-			else if(speed < maxSpeed){	//max speed
+			else if(speed < maxSpeed){				//max speed
 				speed += acceleration;
 			}
 			if (speed > maxSpeed) {
@@ -344,11 +347,11 @@ window.onload = function() {
 			}
 		}
 
-		function reverse() {		//reverse function
-			if (speed > 0) {		// if going forward, brake and reverse
+		function reverse() {						//reverse function
+			if (speed > 0) {						// if going forward, brake and reverse
 				speed -= (acceleration + braking);
 			}
-			else if(speed > (-maxSpeed / 2)) {	// min speed
+			else if(speed > (-maxSpeed / 2)) {		// min speed
 				speed -= acceleration;
 			}
 			else if (speed < (-maxSpeed / 2)) {
@@ -356,7 +359,7 @@ window.onload = function() {
 			}
 		}
 
-		function decelerate() {
+		function decelerate() {		//deceleration function for when the player lets go of the up button or starts moving backwards
 			if (speed > 0) {
 				speed -= braking;
 			}
@@ -373,17 +376,17 @@ window.onload = function() {
 		var setEventHandlers = function() {//set all of the callback functions for socket events
 			
 			console.log("setEventHandlers");
-			socket.on('newPlayer', onNewPlayer);//new player
-			socket.on('connect', onSocketConnected);//new connection
-			socket.on('movePlayer', onMovePlayer);//send a new id to the new player
+			socket.on('newPlayer', onNewPlayer);		//new player
+			socket.on('connect', onSocketConnected);	//new connection
+			socket.on('movePlayer', onMovePlayer);		//send a new id to the new player
 			socket.on('disconnect', onSocketDisconnect);//one of the players has moved
-			socket.on('removePlayer', onRemovePlayer);//player disconnected
-			socket.on('playerID', function(data) {
+			socket.on('removePlayer', onRemovePlayer);	//player disconnected
+			socket.on('playerID', function(data) {		//set the id of this player
 				player.id = data.id;
 				player.playerNum = data.playerNum;
-				player.x += (player.playerNum*35);
+				player.x += (player.playerNum*35);		//set the starting location
 			});
-			socket.on('gameFinish', onGameFinish);//remove player from game
+			socket.on('gameFinish', onGameFinish);		//notify server that a player has one the game
 			
 		}
 		
@@ -391,19 +394,12 @@ window.onload = function() {
 			console.log('Connected to socket server');
 			
 			socket.emit('newPlayer', { x: player.x, y: player.y, angle: player.angle });	//send server info to create new player
-			
 		}
 
 		function onSocketDisconnect () {
  			console.log('Disconnected from socket server');
 		}
-		
-		// function setPlayerId(data) {
-		// 	player.id = data.id;
-		// 	player.playerNum = data.playerNum;	//index in the servers player list
-		// 	player.x += (player.playerNum*35);	//set starting position based on how many people are connected
-		// }
-		
+				
 		function onNewPlayer (data) {
 			console.log('New player connected:', data.id);
 
@@ -440,11 +436,11 @@ window.onload = function() {
 		}
 		
 		function onGameFinish (data) {
-			endText.setText("You Lose!");
+			endText.setText("You Lose!");	// I lost :(
 			endText.anchor.setTo(0.5, 0.5);
 		}
 		
-		function checkOverlap(spriteA, spriteB) {
+		function checkOverlap(spriteA, spriteB) {	//checks to see if the player is crossing the finish line
 
 			var boundsA = spriteA.getBounds();
 			var boundsB = spriteB.getBounds();
@@ -495,6 +491,8 @@ window.onload = function() {
 
 	        // update camera position
 	        game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, 0.5, 0.5);
+			
+			//update location of endText to follow player
 			endText.x = player.x;
 			endText.y = player.y;
 			
@@ -502,23 +500,26 @@ window.onload = function() {
 			if (checkOverlap(player, finish)&& cooldown < 0)
 			{
 				player.laps++;
-				cooldown = 2400;//resets cooldown to prevent multiple lap increments
+				cooldown = 2400;	//resets cooldown to prevent multiple lap increments
 				if(player.laps >= 3){
 					socket.emit('gameWin', { id:player.id});
-					endText.setText("You Win!")
+					endText.setText("You Win!");	//I won :)
 				}
 			}
-			cooldown--;//decrement cooldown
-			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
+			
+			cooldown--;	//decrement cooldown
+			
+			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);	//display the lap the the player is currently on
 	
 	        // check for collisions
-	        //var hitArrows = game.physics.arcade.collide(player, arrow);
 			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			
 			if(hitObstacle == true){
 				speed = 0;
 				//if the obstacle is a map/path boundary, should their speed still drop to 0?
 			}
+			
+			//update server of the players new location
 			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle, laps: player.laps});
 		}
 
