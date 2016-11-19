@@ -1,3 +1,6 @@
+//Some ideas on how to run a game server taken from:
+//https://github.com/xicombd/phaser-multiplayer-game
+
 //stores all the functions and info needed for the server to keep track of players who are connected
 
 var Player = function (startX, startY, startAngle) {
