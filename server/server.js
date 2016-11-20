@@ -11,7 +11,7 @@ var Player = require('./player'); 	//include our player variable
 var fs = require('fs');
 var path = require('path');
 
-var PORT = 31337;					//we are 1337 h4x0r5
+var PORT = 31338;					//we are 1337 h4x0r5
 
 app.use(express.static('public'));
 var players;

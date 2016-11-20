@@ -36,6 +36,7 @@ window.onload = function() {
     	var boundaries;
 
     	function preload () {	//load in map and sprites
+            game.load.spritesheet('sampleman', 'spritesheet.png', 60, 80, 2); //x and y of each sprite is 60 and 80, and there are 2 sprites in the spritesheet
 			game.load.image('bluebike', 'bluebike.png');		//sprite of player
 			game.load.image('trashCan', 'trashCan.png');		//sprite of trash can obstacle
 			game.load.image('arrow', 'arrow.png');				//sprite of arrow used to direct players
@@ -188,7 +189,29 @@ window.onload = function() {
 			var staticObstacle27 = obstacles.create(4502, 16125, 'trashCan');
 			staticObstacle27.anchor.setTo(0.5, 0.5);
 			staticObstacle27.body.immovable = true;
+            
+/*          var samplePedestrian = obstacles.create(2836, 1316, 'sampleman');   //chose these coordinates to be near an arrow (that I know is on the path). hopefully the track where I picked isn't too wide.
+                                                                                //ending (x) position will be 8929 (6060 pixels from the start point). the opposite will be true when it goes back to start.
+            samplePedestrian.frame = 0; //initially displays the first frame
+            samplePedestrian.anchor.setTo(1,1);      //adding this line and...
+            samplePedestrian.body.immovable = false; //this line because the other obstacles do it too
+            samplePedestrian.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
+            samplePedestrian.animations.play('move'); */
 		}
+        
+/*         function createMovingObs(){
+            //moving_obstacles = game.add.group();
+			//moving_obstacles.enableBody = true;
+            var samplePedestrian = game.add.sprite(2839, 1916, 'sampleman');   //chose these coordinates to be near an arrow (that I know is on the path). hopefully the track where I picked isn't too wide.
+                                                                                //ending (x) position will be 8929 (6060 pixels from the start point). the opposite will be true when it goes back to start.
+            //samplePedestrian.enableBody = true;
+            samplePedestrian.anchor.setTo(0.5, 0.5);
+            samplePedestrian.scale.setTo(0.75,0.75);
+            samplePedestrian.frame = 0; //initially displays the first frame
+            samplePedestrian.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
+            samplePedestrian.animations.play('move');
+            
+        } */
 		
 		function createArrows(){	//terrible way of loading in all of the arrows into the game
 			var arrow = game.add.sprite(2856, 16022, 'arrow');
@@ -396,6 +419,7 @@ window.onload = function() {
 		    player.laps = 1;
 	        game.physics.arcade.enable(player);
 	        player.body.collideWorldBounds = true;
+            player.body.bounce.setTo(4,4);
 
 	        // create objects
 	        createObjects();
@@ -406,6 +430,20 @@ window.onload = function() {
 
 	        //load in obstacles
 			createObs();
+            
+            //load in moving obstacles
+            //createMovingObs();    //works but I cant animate things inside it
+            
+            samplePedestrian = game.add.sprite(2779, 1616, 'sampleman');   //chose these coordinates to be near an arrow (that I know is on the path). hopefully the track where I picked isn't too wide.
+                                                                                //ending (x) position will be 8929 (6060 pixels from the start point). the opposite will be true when it goes back to start.
+            //samplePedestrian.anchor.setTo(0.5, 0.5);
+            samplePedestrian.scale.setTo(0.75,0.75);
+            game.physics.arcade.enable(samplePedestrian);
+            //samplePedestrian.enableBody = true;
+            //samplePedestrian.body.immovable = true;
+            samplePedestrian.frame = 0; //initially displays the first frame
+            samplePedestrian.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
+            samplePedestrian.animations.play('move');
 			
 	        // set up camera size
 	        game.camera.width = WINDOWWIDTH;
@@ -427,6 +465,13 @@ window.onload = function() {
 			console.log("sendPlayers");		//tell server that you are ready to recieve the other players connected
 			socket.emit('sendPlayers', {id: player.id});
 			
+        }
+        
+        function move()
+        {                
+            game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x + 600, samplePedestrian.body.y, 1000);
+            game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x - 600, samplePedestrian.body.y, 1000);
+            //move();
         }
 
         function toDegrees (angle) {		//converts an angle to degrees
@@ -703,15 +748,33 @@ window.onload = function() {
 			{
 				getPowerUp();
 			}
+            
+            move();
+            //animate samplePedestrian      //this currently causes the game not to load
+            //TODO: make a helper function to animate all moving obstacles
+            //sampleman.body.velocity.x = 100; //this might be way too fast
+            //game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x + 6000, samplePedestrian.body.y, 150, 5000);
+            //if(samplePedestrian.x > 8929)
+            //{
+            //    samplePedestrian.x = 2776;
+                //if(samplePedestrian.x > 2836)
+                //{
+                //    samplePedestrian.x -= 100;
+                //}
+            //} 
 	
 	        // check for collisions
 			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			var hitBoundaries = game.physics.arcade.collide(player, boundaries);
+            //var hitMoving_Obstacle = game.physics.arcade.collide(player, moving_obstacles);
 			
 			if(hitObstacle == true){
 				speed = 0;
 				//if the obstacle is a map/path boundary, should their speed still drop to 0?
 			}
+            //if(hitMoving_Obstacle == true){
+            //    speed = 0;
+            //}
 			
 			//update server of the players new location
 			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle, laps: player.laps});
