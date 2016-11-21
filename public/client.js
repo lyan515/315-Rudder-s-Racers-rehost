@@ -29,6 +29,12 @@ window.onload = function() {
     	var reversing = false;
     	var turnSpeed = 0.05;
 		var cooldown = 0;
+		var cooldown = 0;
+		var gotPow = 0;
+		var powType = -1;
+		var koolaid = false;
+		var koolaidCooldown = 0;//duration of maroon koolaid powerup
+		var powLeft = 1; //how many poweups are left on screen
 		var endText;
 		var gotPow = 0;
 
@@ -413,6 +419,7 @@ window.onload = function() {
 
 	        // controls
 	        cursors = game.input.keyboard.createCursorKeys();
+			space = game.input.keyboard.addKeys({'spacebar': Phaser.Keyboard.SPACEBAR});
 			
 			// endText that gets changed when player wins or loses
 			endText = game.add.text(player.x, player.y, "", {
@@ -440,7 +447,7 @@ window.onload = function() {
 			else if(speed < maxSpeed){				//max speed
 				speed += acceleration;
 			}
-			if (speed > maxSpeed) {
+			if (speed > maxSpeed && koolaid == false) {
 				speed = maxSpeed;
 			}
 		}
@@ -589,7 +596,7 @@ window.onload = function() {
 			player.playerNum = data.playerNum;	//index in the servers player list
 			player.x += (player.playerNum*35);	//set starting position based on how many people are connected
 		}
-		
+
 		function onNewPlayer (data) {
 			console.log('New player connected:', data.id);
 
@@ -637,10 +644,61 @@ window.onload = function() {
 			return Phaser.Rectangle.intersects(boundsA, boundsB);
 
 		}
+		//power up acquisition
+		function getPowerUp(){
+			powerUp.kill();
+			powType = 0;
+			gotPow = 1;
+		}
+		
+		function powerUpText(){
+			var powText = "";
+			
+			if(powType == 0){
+				powText = "Maroon Koolaid";
+			}
+			else if(powType == 1){
+				powText = "Textbook";
+			}
+			else{
+				powText = "None";
+			}
+			
+			game.debug.text("Powerup: "+ powText, 32, 64);
+		}
+		//activate maroon koolaid
+		function marKoolaid(){
+			speed = 1050;//700*1.5
+			maxSpeed = 1050;
+			koolaid = true;
+			koolaidCooldown = 180;
+			powType = -1;
+			gotPow = 0;
+		}
+		
+		//resets speed for person 3 seconds after maroon koolaid activation
+		function resetSpeed(){
+			speed = 700;
+			maxSpeed = 700;
+			koolaid = false;
+		}
+		
+		//work in progress: Spawns and throws a book, sprite is killed after 1 collision
+		function throwBook(){
+			powType = -1;
+			gotPow = 0;
+		}
 		
 		function update() {
-			// player movement
-
+			//Check for Maroon Koolaid first
+			if(koolaid == true && koolaidCooldown < 0){
+				resetSpeed();
+			}
+			koolaidCooldown--;//cooldown deccrmenter  for 
+			
+			
+			
+			// player movement up/down
 	        if (cursors.up.isDown) {	//forward and backward movement
 				forward();
 				reversing = false;
@@ -658,8 +716,8 @@ window.onload = function() {
 	        	player.body.velocity.x = (speed * Math.sin(angle));
 	        	player.body.velocity.y = (-speed * Math.cos(angle));
 	        }
-
-	        if (cursors.left.isDown) {			//left and right angled movement
+			//player rotation
+	        if (cursors.left.isDown) {			
 	            if (cursors.down.isDown) {		//two buttons pressed simultaneously 
 	                angle -= turnSpeed * 0.5;
 	            }
@@ -677,7 +735,22 @@ window.onload = function() {
 	            }
 	            player.angle = toDegrees(angle);
 	        }
-
+			
+			
+			
+			//power up activation
+			if (space.spacebar.isDown) {	
+	            if (powType == -1) {
+	            }
+	            else if (powType == 0) {
+					marKoolaid();
+	            }
+	            else if (powType == 1) {
+	                throwBook();
+	            }
+	        }
+			
+			
 	        // update camera position
 	        game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, 0.5, 0.5);
 			
@@ -703,14 +776,27 @@ window.onload = function() {
 			{
 				getPowerUp();
 			}
+			//UI elements
+			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
+			powerUpText();
+			
+			//check for power up acquisition
+			if(powLeft >= 1)
+			{
+				if (checkOverlap(player, powerUp)==true && gotPow == 0)//weird glitch where this is true when it shouldnt be
+				{
+					powLeft--;
+					getPowerUp();
+				}
+			}
 	
 	        // check for collisions
 			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			var hitBoundaries = game.physics.arcade.collide(player, boundaries);
 			
-			if(hitObstacle == true){
+			if(hitObstacle == true && koolaid == false)
+			{
 				speed = 0;
-				//if the obstacle is a map/path boundary, should their speed still drop to 0?
 			}
 			
 			//update server of the players new location
