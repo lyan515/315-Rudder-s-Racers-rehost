@@ -14,7 +14,7 @@ window.onload = function() {
 	var PLAYERSTARTX = 864;
 	var PLAYERSTARTY = 8111;
 
-	var game = new Phaser.Game(WINDOWWIDTH, WINDOWHEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update});
+	var game = new Phaser.Game(WINDOWWIDTH, WINDOWHEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render});
 
 	var socket;
 	var otherPlayers = [];
@@ -364,8 +364,8 @@ window.onload = function() {
 		mapBR.scale.setTo(SCALEFACTOR, SCALEFACTOR);
 		
 		//load in finish line
-		finish = game.add.sprite(3100, 16065, 'finish');
-		finish.scale.setTo(0.25, .75);
+		finish = game.add.sprite(1330, 8208, 'finish');
+		finish.scale.setTo(0.5, .81);
 
 		// load in arrows
 		//createArrows();
@@ -719,5 +719,9 @@ window.onload = function() {
 		}
 		reader.send(null);
 		return response;
+	}
+
+	function render () {
+		game.debug.spriteInfo(player, 32, 128);
 	}
 };
