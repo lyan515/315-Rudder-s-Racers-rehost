@@ -30,13 +30,11 @@ window.onload = function() {
     	var turnSpeed = 0.05;
 		var cooldown = 0;
 		var cooldown = 0;
-		var gotPow = 0;
 		var powType = -1;
 		var koolaid = false;
 		var koolaidCooldown = 0;//duration of maroon koolaid powerup
-		var powLeft = 1; //how many poweups are left on screen
 		var endText;
-		var gotPow = 0;
+		var gotPow = false;
 
     	var obstacles;
     	var boundaries;
@@ -373,6 +371,7 @@ window.onload = function() {
 				console.log("creating power-up at: " + powerUpArray[i].scaledX + ", " + powerUpArray[i].scaledY);
 				powerUpObject = powerUps.create(powerUpArray[i].scaledX, powerUpArray[i].scaledY, 'powerUp');
 				powerUpObject.anchor.setTo(0, 0);
+				powerUpObject.scale.setTo(0.2, 0.2);
 				powerUpObject.body.immovable = true;
 			}
 		}
@@ -419,13 +418,6 @@ window.onload = function() {
 
 	        // create objects
 	        createObjects();
-			
-			// set up powerup
-			powerUp = game.add.sprite(2900, 15000, 'powerUp');
-			powerUp.scale.setTo(0.25, 0.25);
-
-	        //load in obstacles
-			//createObs();
             
             //load in moving obstacles
             createMovingObs();    //works now
@@ -571,14 +563,14 @@ window.onload = function() {
 
 		}
 		
-		function getPowerUp(){
-			if(gotPow == 0){
-				game.debug.text("Got Power Up!!!", 32, 64);
-				powerUp.kill();
-				gotPow = 1;
-			}				
-			//powerUp.destroy();
-		}
+		// function getPowerUp(){
+		// 	if(gotPow == 0){
+		// 		game.debug.text("Got Power Up!!!", 32, 64);
+		// 		powerUp.kill();
+		// 		gotPow = 1;
+		// 	}				
+		// 	//powerUp.destroy();
+		// }
 
 		var setEventHandlers = function() {//set all of the callback functions for socket events
 			socket.on('connect', onSocketConnected);//new connection
@@ -662,10 +654,10 @@ window.onload = function() {
 
 		}
 		//power up acquisition
-		function getPowerUp(){
+		function getPowerUp(player, powerUp){
 			powerUp.kill();
 			powType = 0;
-			gotPow = 1;
+			gotPow = true;
 		}
 		
 		function powerUpText(){
@@ -690,7 +682,7 @@ window.onload = function() {
 			koolaid = true;
 			koolaidCooldown = 180;
 			powType = -1;
-			gotPow = 0;
+			gotPow = false;
 		}
 		
 		//resets speed for person 3 seconds after maroon koolaid activation
@@ -703,7 +695,7 @@ window.onload = function() {
 		//work in progress: Spawns and throws a book, sprite is killed after 1 collision
 		function throwBook(){
 			powType = -1;
-			gotPow = 0;
+			gotPow = false;
 		}
 		
 		function update() {
@@ -792,23 +784,12 @@ window.onload = function() {
 			//UI elements
 			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
 			powerUpText();
-			
-			//check for power up acquisition
-			
-			if(powLeft >= 1)
-			{
-				if (checkOverlap(player, powerUp)==true && gotPow == 0)//weird glitch where this is true when it shouldnt be
-				{
-					powLeft = 0;
-					getPowerUp();
-				}
-			}
-			game.debug.text("Powerups left: "+ powLeft , 32, 96);
-	        // check for collisions
+
+			// check for collisions
 			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			var hitBoundaries = game.physics.arcade.collide(player, boundaries);
 			var hitMoving_Obstacle = game.physics.arcade.collide(player, samplePedestrian);
-			
+			var powerUpOverlap = game.physics.arcade.overlap(player, powerUps, getPowerUp, function () { return !gotPow; });		
 			
 			if(hitObstacle == true && koolaid == false)
 			{
