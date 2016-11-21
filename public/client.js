@@ -46,6 +46,7 @@ window.onload = function() {
 			game.load.image('mapBL', 'campusCircuit_BL.png');	//bottom left of map
 			game.load.image('mapBR', 'campusCircuit_BR.png');	//bottom right of map\
 			game.load.image('powerUp', 'pow.png');
+            //game.load.image('sampleman', 'sample_man.png');
 			
 			game.load.image('finish', 'finishline.png');		//finish line
         }
@@ -199,19 +200,17 @@ window.onload = function() {
             samplePedestrian.animations.play('move'); */
 		}
         
-/*         function createMovingObs(){
-            //moving_obstacles = game.add.group();
-			//moving_obstacles.enableBody = true;
-            var samplePedestrian = game.add.sprite(2839, 1916, 'sampleman');   //chose these coordinates to be near an arrow (that I know is on the path). hopefully the track where I picked isn't too wide.
-                                                                                //ending (x) position will be 8929 (6060 pixels from the start point). the opposite will be true when it goes back to start.
-            //samplePedestrian.enableBody = true;
+        function createMovingObs(){
+            samplePedestrian = game.add.sprite(2839, 1916, 'sampleman');   //chose these coordinates to be near an arrow (that I know is on the path). hopefully the track where I picked isn't too wide.
+                                                                           //ending (x) position will be 3239 the opposite will be true when it goes back to start.
             samplePedestrian.anchor.setTo(0.5, 0.5);
             samplePedestrian.scale.setTo(0.75,0.75);
+            game.physics.arcade.enable(samplePedestrian);
+            samplePedestrian.body.immovable = true;
             samplePedestrian.frame = 0; //initially displays the first frame
             samplePedestrian.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
             samplePedestrian.animations.play('move');
-            
-        } */
+        } 
 		
 		function createArrows(){	//terrible way of loading in all of the arrows into the game
 			var arrow = game.add.sprite(2856, 16022, 'arrow');
@@ -432,18 +431,8 @@ window.onload = function() {
 			createObs();
             
             //load in moving obstacles
-            //createMovingObs();    //works but I cant animate things inside it
+            createMovingObs();    //works now
             
-            samplePedestrian = game.add.sprite(2779, 1616, 'sampleman');   //chose these coordinates to be near an arrow (that I know is on the path). hopefully the track where I picked isn't too wide.
-                                                                                //ending (x) position will be 8929 (6060 pixels from the start point). the opposite will be true when it goes back to start.
-            //samplePedestrian.anchor.setTo(0.5, 0.5);
-            samplePedestrian.scale.setTo(0.75,0.75);
-            game.physics.arcade.enable(samplePedestrian);
-            //samplePedestrian.enableBody = true;
-            //samplePedestrian.body.immovable = true;
-            samplePedestrian.frame = 0; //initially displays the first frame
-            samplePedestrian.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
-            samplePedestrian.animations.play('move');
 			
 	        // set up camera size
 	        game.camera.width = WINDOWWIDTH;
@@ -469,8 +458,8 @@ window.onload = function() {
         
         function move()
         {                
-            game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x + 600, samplePedestrian.body.y, 1000);
-            game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x - 600, samplePedestrian.body.y, 1000);
+            game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x + 300, samplePedestrian.body.y, 4000);
+            game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x - 300, samplePedestrian.body.y, 4000);
             //move();
         }
 
@@ -749,7 +738,21 @@ window.onload = function() {
 				getPowerUp();
 			}
             
-            move();
+            //move();
+            samplePedestrian.body.velocity.x = 200;
+            if(samplePedestrian.body.x >= 3039)
+            {
+                samplePedestrian.body.x = 2839;
+                samplePedestrian.body.y = 1916;
+                //game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x + 300, samplePedestrian.body.y, 4000);
+                //game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x - 300, samplePedestrian.body.y, 4000);
+            }
+            
+            //if (checkOverlap(player, samplePedestrian)==true)
+            //{
+            //    speed = 0;
+            //}
+            
             //animate samplePedestrian      //this currently causes the game not to load
             //TODO: make a helper function to animate all moving obstacles
             //sampleman.body.velocity.x = 100; //this might be way too fast
@@ -761,20 +764,20 @@ window.onload = function() {
                 //{
                 //    samplePedestrian.x -= 100;
                 //}
-            //} 
+            //}
 	
 	        // check for collisions
 			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			var hitBoundaries = game.physics.arcade.collide(player, boundaries);
-            //var hitMoving_Obstacle = game.physics.arcade.collide(player, moving_obstacles);
+            var hitMoving_Obstacle = game.physics.arcade.collide(player, samplePedestrian);
 			
 			if(hitObstacle == true){
 				speed = 0;
 				//if the obstacle is a map/path boundary, should their speed still drop to 0?
 			}
-            //if(hitMoving_Obstacle == true){
-            //    speed = 0;
-            //}
+            if(hitMoving_Obstacle == true){
+                speed = 0;
+            }
 			
 			//update server of the players new location
 			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle, laps: player.laps});
