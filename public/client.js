@@ -399,9 +399,10 @@ window.onload = function() {
 	        player = game.add.sprite(PLAYERSTARTX, PLAYERSTARTY, 'bluebike');
 	        player.anchor.setTo(0.5, 0.5);
 		    player.scale.setTo(0.5, 0.5);
-		    player.laps = 1;
+		    player.laps = 0;
 	        game.physics.arcade.enable(player);
 	        player.body.collideWorldBounds = true;
+			player.body.bounce.setTo(4,4);
 
 	        // create objects
 	        createObjects();
@@ -771,25 +772,22 @@ window.onload = function() {
 
 			cooldown--;//decrement cooldown
 			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
-			
-			if (checkOverlap(player, powerUp)==true)
-			{
-				getPowerUp();
-			}
+
 			//UI elements
 			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
 			powerUpText();
 			
 			//check for power up acquisition
+			
 			if(powLeft >= 1)
 			{
 				if (checkOverlap(player, powerUp)==true && gotPow == 0)//weird glitch where this is true when it shouldnt be
 				{
-					powLeft--;
+					powLeft = 0;
 					getPowerUp();
 				}
 			}
-	
+			game.debug.text("Powerups left: "+ powLeft , 32, 96);
 	        // check for collisions
 			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			var hitBoundaries = game.physics.arcade.collide(player, boundaries);
