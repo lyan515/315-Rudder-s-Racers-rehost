@@ -11,10 +11,10 @@ window.onload = function() {
     	var WINDOWWIDTH = 1280;
     	var WINDOWHEIGHT = 720;
 
-    	var PLAYERSTARTX = 2904;
-    	var PLAYERSTARTY = 16102;
+    	var PLAYERSTARTX = 864;
+    	var PLAYERSTARTY = 8111;
 
-        var game = new Phaser.Game(WINDOWWIDTH, WINDOWHEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update});
+        var game = new Phaser.Game(WINDOWWIDTH, WINDOWHEIGHT, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render});
 
 		var socket;
 		var otherPlayers = [];
@@ -754,6 +754,10 @@ window.onload = function() {
 		    }
 		    reader.send(null);
 		    return response;
+		}
+
+		function render () {
+			game.debug.spriteInfo(player);
 		}
 		
     };
