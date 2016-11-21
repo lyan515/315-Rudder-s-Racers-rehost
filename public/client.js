@@ -3,9 +3,9 @@
 
 window.onload = function() {
 
-		var MAPPANELWIDTH = 3840;
-		var MAPPANELHEIGHT = 3347;
-		var SCALEFACTOR = 3;
+		var MAPPANELWIDTH = 4096;
+		var MAPPANELHEIGHT = 4096;
+		var SCALEFACTOR = 1.25;
 		var WORLDWIDTH = MAPPANELWIDTH * 2 * SCALEFACTOR;
     	var WORLDHEIGHT = MAPPANELHEIGHT * 2 * SCALEFACTOR;
     	var WINDOWWIDTH = 1280;
@@ -40,10 +40,10 @@ window.onload = function() {
 			game.load.image('trashCan', 'trashCan.png');		//sprite of trash can obstacle
 			game.load.image('arrow', 'arrow.png');				//sprite of arrow used to direct players
 			// total map size: 7680 x 6694
-			game.load.image('mapTL', 'campusCircuit_TL.png');	//top left of map
-			game.load.image('mapTR', 'campusCircuit_TR.png');	//top right of map
-			game.load.image('mapBL', 'campusCircuit_BL.png');	//bottom left of map
-			game.load.image('mapBR', 'campusCircuit_BR.png');	//bottom right of map\
+			game.load.image('mapTL', 'campusCircuit_Small_TL.png');	//top left of map
+			game.load.image('mapTR', 'campusCircuit_Small_TR.png');	//top right of map
+			game.load.image('mapBL', 'campusCircuit_Small_BL.png');	//bottom left of map
+			game.load.image('mapBR', 'campusCircuit_Small_BR.png');	//bottom right of map\
 			game.load.image('powerUp', 'pow.png');
 			
 			game.load.image('finish', 'finishline.png');		//finish line
@@ -387,7 +387,7 @@ window.onload = function() {
 			finish.scale.setTo(0.25, .75);
 
 	        // load in arrows
-	        createArrows();
+	        //createArrows();
 
 	        // player
 	        player = game.add.sprite(PLAYERSTARTX, PLAYERSTARTY, 'bluebike');
@@ -398,14 +398,14 @@ window.onload = function() {
 	        player.body.collideWorldBounds = true;
 
 	        // create objects
-	        createObjects();
+	        //createObjects();
 			
 			// set up powerup
 			powerUp = game.add.sprite(2900, 15000, 'powerUp');
 			powerUp.scale.setTo(0.25, 0.25);
 
 	        //load in obstacles
-			createObs();
+			//createObs();
 			
 	        // set up camera size
 	        game.camera.width = WINDOWWIDTH;
