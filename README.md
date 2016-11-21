@@ -4,6 +4,8 @@ To clone directory:
 `git clone git@github.tamu.edu:ameserole/315-game-TheIDontKnows.git`  
 To view deliverable 4:   
 `git checkout D4` 
+To view deliverable 6:  
+`git checkout D6`  
 
 ##Running Game Server  
 To run server run the command: 
