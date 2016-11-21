@@ -1,8 +1,8 @@
 // width and height of single map panel image
-var MAPPANELWIDTH = 3840;
-var MAPPANELHEIGHT = 3347;
+var MAPPANELWIDTH = 4096;
+var MAPPANELHEIGHT = 4096;
 // scale factor for game world
-var SCALEFACTOR = 3;
+var SCALEFACTOR = 1.25;
 var PLACEDOBJECTSCALEFACTOR = 0.5;
 // width and height of game world
 //	depend on map panel dimensions and scale factor
@@ -68,10 +68,10 @@ function preload () {
 	game.load.image('obstacle', 'trashCan.png');
 	game.load.image('powerUp', 'powerUp.png');
 	// total map size: 7680 x 6694
-	game.load.image('mapTL', 'campusCircuit_TL.png');
-	game.load.image('mapTR', 'campusCircuit_TR.png');
-	game.load.image('mapBL', 'campusCircuit_BL.png');
-	game.load.image('mapBR', 'campusCircuit_BR.png');
+	game.load.image('mapTL', 'campusCircuit_Small_TL.png');
+	game.load.image('mapTR', 'campusCircuit_Small_TR.png');
+	game.load.image('mapBL', 'campusCircuit_Small_BL.png');
+	game.load.image('mapBR', 'campusCircuit_Small_BR.png');
 	
 	//create soccket connection
 	socket = io.connect({
