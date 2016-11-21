@@ -807,12 +807,14 @@ window.onload = function() {
 	        // check for collisions
 			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			var hitBoundaries = game.physics.arcade.collide(player, boundaries);
+            var hitMoving_Obstacle = game.physics.arcade.collide(player, samplePedestrian);
 			
 			if(hitObstacle == true && koolaid == false)
 			{
 				speed = 0;
 			}
-			if(hitMoving_Obstacle == true && koolaid == false){
+			if(hitMoving_Obstacle == true && koolaid == false)
+            {
                 speed = 0;
             }
 			//update server of the players new location
