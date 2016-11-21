@@ -47,10 +47,10 @@ window.onload = function() {
 			game.load.image('trashCan', 'trashCan.png');		//sprite of trash can obstacle
 			game.load.image('arrow', 'arrow.png');				//sprite of arrow used to direct players
 			// total map size: 7680 x 6694
-			game.load.image('mapTL', 'campusCircuit_TL.png');	//top left of map
-			game.load.image('mapTR', 'campusCircuit_TR.png');	//top right of map
-			game.load.image('mapBL', 'campusCircuit_BL.png');	//bottom left of map
-			game.load.image('mapBR', 'campusCircuit_BR.png');	//bottom right of map\
+			game.load.image('mapTL', 'campusCircuit_Small_TL.png');	//top left of map
+            game.load.image('mapTR', 'campusCircuit_Small_TR.png');	//top right of map
+            game.load.image('mapBL', 'campusCircuit_Small_BL.png');	//bottom left of map
+            game.load.image('mapBR', 'campusCircuit_Small_BR.png');	//bottom right of map
 			game.load.image('powerUp', 'pow.png');
 			
 			game.load.image('finish', 'finishline.png');		//finish line
