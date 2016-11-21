@@ -29,6 +29,12 @@ window.onload = function() {
     	var reversing = false;
     	var turnSpeed = 0.05;
 		var cooldown = 0;
+		var cooldown = 0;
+		var gotPow = 0;
+		var powType = -1;
+		var koolaid = false;
+		var koolaidCooldown = 0;//duration of maroon koolaid powerup
+		var powLeft = 1; //how many poweups are left on screen
 		var endText;
 		var gotPow = 0;
 
@@ -46,7 +52,6 @@ window.onload = function() {
 			game.load.image('mapBL', 'campusCircuit_BL.png');	//bottom left of map
 			game.load.image('mapBR', 'campusCircuit_BR.png');	//bottom right of map\
 			game.load.image('powerUp', 'pow.png');
-            //game.load.image('sampleman', 'sample_man.png');
 			
 			game.load.image('finish', 'finishline.png');		//finish line
         }
@@ -190,14 +195,6 @@ window.onload = function() {
 			var staticObstacle27 = obstacles.create(4502, 16125, 'trashCan');
 			staticObstacle27.anchor.setTo(0.5, 0.5);
 			staticObstacle27.body.immovable = true;
-            
-/*          var samplePedestrian = obstacles.create(2836, 1316, 'sampleman');   //chose these coordinates to be near an arrow (that I know is on the path). hopefully the track where I picked isn't too wide.
-                                                                                //ending (x) position will be 8929 (6060 pixels from the start point). the opposite will be true when it goes back to start.
-            samplePedestrian.frame = 0; //initially displays the first frame
-            samplePedestrian.anchor.setTo(1,1);      //adding this line and...
-            samplePedestrian.body.immovable = false; //this line because the other obstacles do it too
-            samplePedestrian.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
-            samplePedestrian.animations.play('move'); */
 		}
         
         function createMovingObs(){
@@ -415,10 +412,10 @@ window.onload = function() {
 	        player = game.add.sprite(PLAYERSTARTX, PLAYERSTARTY, 'bluebike');
 	        player.anchor.setTo(0.5, 0.5);
 		    player.scale.setTo(0.5, 0.5);
-		    player.laps = 1;
+		    player.laps = 0;
 	        game.physics.arcade.enable(player);
 	        player.body.collideWorldBounds = true;
-            player.body.bounce.setTo(4,4);
+			player.body.bounce.setTo(4,4);
 
 	        // create objects
 	        createObjects();
@@ -432,7 +429,6 @@ window.onload = function() {
             
             //load in moving obstacles
             createMovingObs();    //works now
-            
 			
 	        // set up camera size
 	        game.camera.width = WINDOWWIDTH;
@@ -440,6 +436,7 @@ window.onload = function() {
 
 	        // controls
 	        cursors = game.input.keyboard.createCursorKeys();
+			space = game.input.keyboard.addKeys({'spacebar': Phaser.Keyboard.SPACEBAR});
 			
 			// endText that gets changed when player wins or loses
 			endText = game.add.text(player.x, player.y, "", {
@@ -455,13 +452,6 @@ window.onload = function() {
 			socket.emit('sendPlayers', {id: player.id});
 			
         }
-        
-        function move()
-        {                
-            game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x + 300, samplePedestrian.body.y, 4000);
-            game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x - 300, samplePedestrian.body.y, 4000);
-            //move();
-        }
 
         function toDegrees (angle) {		//converts an angle to degrees
         	return angle * (180 / Math.PI);
@@ -474,7 +464,7 @@ window.onload = function() {
 			else if(speed < maxSpeed){				//max speed
 				speed += acceleration;
 			}
-			if (speed > maxSpeed) {
+			if (speed > maxSpeed && koolaid == false) {
 				speed = maxSpeed;
 			}
 		}
@@ -623,7 +613,7 @@ window.onload = function() {
 			player.playerNum = data.playerNum;	//index in the servers player list
 			player.x += (player.playerNum*35);	//set starting position based on how many people are connected
 		}
-		
+
 		function onNewPlayer (data) {
 			console.log('New player connected:', data.id);
 
@@ -671,10 +661,61 @@ window.onload = function() {
 			return Phaser.Rectangle.intersects(boundsA, boundsB);
 
 		}
+		//power up acquisition
+		function getPowerUp(){
+			powerUp.kill();
+			powType = 0;
+			gotPow = 1;
+		}
+		
+		function powerUpText(){
+			var powText = "";
+			
+			if(powType == 0){
+				powText = "Maroon Koolaid";
+			}
+			else if(powType == 1){
+				powText = "Textbook";
+			}
+			else{
+				powText = "None";
+			}
+			
+			game.debug.text("Powerup: "+ powText, 32, 64);
+		}
+		//activate maroon koolaid
+		function marKoolaid(){
+			speed = 1050;//700*1.5
+			maxSpeed = 1050;
+			koolaid = true;
+			koolaidCooldown = 180;
+			powType = -1;
+			gotPow = 0;
+		}
+		
+		//resets speed for person 3 seconds after maroon koolaid activation
+		function resetSpeed(){
+			speed = 700;
+			maxSpeed = 700;
+			koolaid = false;
+		}
+		
+		//work in progress: Spawns and throws a book, sprite is killed after 1 collision
+		function throwBook(){
+			powType = -1;
+			gotPow = 0;
+		}
 		
 		function update() {
-			// player movement
-
+			//Check for Maroon Koolaid first
+			if(koolaid == true && koolaidCooldown < 0){
+				resetSpeed();
+			}
+			koolaidCooldown--;//cooldown deccrmenter  for 
+			
+			
+			
+			// player movement up/down
 	        if (cursors.up.isDown) {	//forward and backward movement
 				forward();
 				reversing = false;
@@ -692,8 +733,8 @@ window.onload = function() {
 	        	player.body.velocity.x = (speed * Math.sin(angle));
 	        	player.body.velocity.y = (-speed * Math.cos(angle));
 	        }
-
-	        if (cursors.left.isDown) {			//left and right angled movement
+			//player rotation
+	        if (cursors.left.isDown) {			
 	            if (cursors.down.isDown) {		//two buttons pressed simultaneously 
 	                angle -= turnSpeed * 0.5;
 	            }
@@ -711,7 +752,22 @@ window.onload = function() {
 	            }
 	            player.angle = toDegrees(angle);
 	        }
-
+			
+			
+			
+			//power up activation
+			if (space.spacebar.isDown) {	
+	            if (powType == -1) {
+	            }
+	            else if (powType == 0) {
+					marKoolaid();
+	            }
+	            else if (powType == 1) {
+	                throwBook();
+	            }
+	        }
+			
+			
 	        // update camera position
 	        game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, 0.5, 0.5);
 			
@@ -732,53 +788,33 @@ window.onload = function() {
 
 			cooldown--;//decrement cooldown
 			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
+
+			//UI elements
+			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
+			powerUpText();
 			
-			if (checkOverlap(player, powerUp)==true)
+			//check for power up acquisition
+			
+			if(powLeft >= 1)
 			{
-				getPowerUp();
+				if (checkOverlap(player, powerUp)==true && gotPow == 0)//weird glitch where this is true when it shouldnt be
+				{
+					powLeft = 0;
+					getPowerUp();
+				}
 			}
-            
-            //move();
-            samplePedestrian.body.velocity.x = 200;
-            if(samplePedestrian.body.x >= 3039)
-            {
-                samplePedestrian.body.x = 2839;
-                samplePedestrian.body.y = 1916;
-                //game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x + 300, samplePedestrian.body.y, 4000);
-                //game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x - 300, samplePedestrian.body.y, 4000);
-            }
-            
-            //if (checkOverlap(player, samplePedestrian)==true)
-            //{
-            //    speed = 0;
-            //}
-            
-            //animate samplePedestrian      //this currently causes the game not to load
-            //TODO: make a helper function to animate all moving obstacles
-            //sampleman.body.velocity.x = 100; //this might be way too fast
-            //game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x + 6000, samplePedestrian.body.y, 150, 5000);
-            //if(samplePedestrian.x > 8929)
-            //{
-            //    samplePedestrian.x = 2776;
-                //if(samplePedestrian.x > 2836)
-                //{
-                //    samplePedestrian.x -= 100;
-                //}
-            //}
-	
+			game.debug.text("Powerups left: "+ powLeft , 32, 96);
 	        // check for collisions
 			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			var hitBoundaries = game.physics.arcade.collide(player, boundaries);
-            var hitMoving_Obstacle = game.physics.arcade.collide(player, samplePedestrian);
 			
-			if(hitObstacle == true){
+			if(hitObstacle == true && koolaid == false)
+			{
 				speed = 0;
-				//if the obstacle is a map/path boundary, should their speed still drop to 0?
 			}
-            if(hitMoving_Obstacle == true){
+			if(hitMoving_Obstacle == true && koolaid == false){
                 speed = 0;
             }
-			
 			//update server of the players new location
 			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle, laps: player.laps});
 		}
