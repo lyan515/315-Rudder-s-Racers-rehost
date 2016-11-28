@@ -786,7 +786,7 @@ window.onload = function() {
 			powerUpText();
 			
 			//sample pedestrian movement
-			//TODO: make more pedestrian objects
+			//TODO: make more pedestrian objects.
             if(samplePedestrian.body.x <=850)
 			{
 				samplePedestrian.body.velocity.x = 160;
