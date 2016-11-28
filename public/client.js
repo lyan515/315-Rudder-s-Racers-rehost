@@ -196,7 +196,7 @@ window.onload = function() {
 		}
         
         function createMovingObs(){
-            samplePedestrian = game.add.sprite(830, 3500, 'sampleman');   //chose these coordinates to be near an arrow (that I know is on the path). hopefully the track where I picked isn't too wide.
+            samplePedestrian = game.add.sprite(850, 3500, 'sampleman');   //chose these coordinates to be near an arrow (that I know is on the path). hopefully the track where I picked isn't too wide.
                                                                            //ending (x) position will be 3239 the opposite will be true when it goes back to start.
             samplePedestrian.anchor.setTo(0.5, 0.5);
             samplePedestrian.scale.setTo(0.75,0.75);
@@ -787,13 +787,13 @@ window.onload = function() {
 			
 			//sample pedestrian movement
 			//TODO: make more pedestrian objects
-			samplePedestrian.body.velocity.x = 160;
-            if(samplePedestrian.body.x >= 1020)
+            if(samplePedestrian.body.x <=850)
+			{
+				samplePedestrian.body.velocity.x = 160;
+			}
+			if(samplePedestrian.body.x >= 1020)
         	{
-                samplePedestrian.body.x = 830;
-                samplePedestrian.body.y = 3500;
-                //game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x + 300, samplePedestrian.body.y, 4000);
-                //game.physics.arcade.moveToXY(samplePedestrian, samplePedestrian.body.x - 300, samplePedestrian.body.y, 4000);
+				samplePedestrian.body.velocity.x = -160;
             }
 
 			// check for collisions
