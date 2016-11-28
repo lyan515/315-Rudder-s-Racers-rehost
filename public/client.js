@@ -785,6 +785,8 @@ window.onload = function() {
 			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
 			powerUpText();
 			
+			//sample pedestrian movement
+			//TODO: make more pedestrian objects
 			samplePedestrian.body.velocity.x = 160;
             if(samplePedestrian.body.x >= 1020)
         	{
