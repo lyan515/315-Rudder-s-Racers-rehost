@@ -195,6 +195,7 @@ window.onload = function() {
 			staticObstacle27.body.immovable = true;
 		}
         
+        //TODO: make a moving obstacles group
         function createMovingObs(){
             samplePedestrian = game.add.sprite(850, 3500, 'sampleman');   //chose these coordinates to be near an arrow (that I know is on the path). hopefully the track where I picked isn't too wide.
                                                                            //ending (x) position will be 3239 the opposite will be true when it goes back to start.
@@ -787,14 +788,14 @@ window.onload = function() {
 			
 			//sample pedestrian movement
 			//TODO: make more pedestrian objects.
-            if(samplePedestrian.body.x <=850)
+			if(samplePedestrian.body.x <= 850)
 			{
 				samplePedestrian.body.velocity.x = 160;
 			}
-			if(samplePedestrian.body.x >= 1020)
-        	{
-				samplePedestrian.body.velocity.x = -160;
-            }
+            		if(samplePedestrian.body.x >= 1020)
+        		 {
+        		 	samplePedestrian.body.velocity.x = -160;
+            		 }
 
 			// check for collisions
 			var hitObstacle = game.physics.arcade.collide(player, obstacles);
