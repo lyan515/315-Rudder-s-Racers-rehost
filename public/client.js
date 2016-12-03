@@ -197,15 +197,81 @@ window.onload = function() {
         
         //TODO: make a moving obstacles group
         function createMovingObs(){
-            samplePedestrian = game.add.sprite(850, 3500, 'sampleman');   //chose these coordinates to be near an arrow (that I know is on the path). hopefully the track where I picked isn't too wide.
-                                                                           //ending (x) position will be 3239 the opposite will be true when it goes back to start.
+            moving_obstacles = game.add.group();
+            moving_obstacles.enableBody = true;
+            samplePedestrian = moving_obstacles.create(850, 3500, 'sampleman');
+            pedestrian1 = moving_obstacles.create(5400, 1380, 'sampleman'); //end y: 1480
+            pedestrian2 = moving_obstacles.create(8990, 2950, 'sampleman'); //end x: 9180   
+            pedestrian3 = moving_obstacles.create(8590, 4900, 'sampleman'); //end x: 8770
+            pedestrian4 = moving_obstacles.create(8590, 6000, 'sampleman'); //end x: 8770
+            pedestrian5 = moving_obstacles.create(6700, 6660, 'sampleman'); //end y: 7050 //enhanced speed: 320
+            pedestrian6 = moving_obstacles.create(5165, 9200, 'sampleman'); //end x: 5360
+            pedestrian7 = moving_obstacles.create(2700, 8290, 'sampleman'); //end y: 8400
+            
             samplePedestrian.anchor.setTo(0.5, 0.5);
-            samplePedestrian.scale.setTo(0.75,0.75);
+            samplePedestrian.scale.setTo(0.70,0.70);
             game.physics.arcade.enable(samplePedestrian);
             samplePedestrian.body.immovable = true;
             samplePedestrian.frame = 0; //initially displays the first frame
             samplePedestrian.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
             samplePedestrian.animations.play('move');
+            
+            pedestrian1.anchor.setTo(0.5, 0.5);
+            pedestrian1.scale.setTo(0.70,0.70);
+            game.physics.arcade.enable(pedestrian1);
+            pedestrian1.body.immovable = true;
+            pedestrian1.frame = 0; //initially displays the first frame
+            pedestrian1.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
+            pedestrian1.animations.play('move');
+            
+            pedestrian2.anchor.setTo(0.5, 0.5);
+            pedestrian2.scale.setTo(0.70,0.70);
+            game.physics.arcade.enable(pedestrian2);
+            pedestrian2.body.immovable = true;
+            pedestrian2.frame = 0; //initially displays the first frame
+            pedestrian2.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
+            pedestrian2.animations.play('move');
+            
+            pedestrian3.anchor.setTo(0.5, 0.5);
+            pedestrian3.scale.setTo(0.70,0.70);
+            game.physics.arcade.enable(pedestrian3);
+            pedestrian3.body.immovable = true;
+            pedestrian3.frame = 0; //initially displays the first frame
+            pedestrian3.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
+            pedestrian3.animations.play('move');
+        
+            pedestrian4.anchor.setTo(0.5, 0.5);
+            pedestrian4.scale.setTo(0.70,0.70);
+            game.physics.arcade.enable(pedestrian4);
+            pedestrian4.body.immovable = true;
+            pedestrian4.frame = 0; //initially displays the first frame
+            pedestrian4.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
+            pedestrian4.animations.play('move');
+
+            pedestrian5.anchor.setTo(0.5, 0.5);
+            pedestrian5.scale.setTo(0.70,0.70);
+            game.physics.arcade.enable(pedestrian5);
+            pedestrian5.body.immovable = true;
+            pedestrian5.frame = 0; //initially displays the first frame
+            pedestrian5.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
+            pedestrian5.animations.play('move');
+/**/
+            pedestrian6.anchor.setTo(0.5, 0.5);
+            pedestrian6.scale.setTo(0.70,0.70);
+            game.physics.arcade.enable(pedestrian6);
+            pedestrian6.body.immovable = true;
+            pedestrian6.frame = 0; //initially displays the first frame
+            pedestrian6.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
+            pedestrian6.animations.play('move');
+
+            pedestrian7.anchor.setTo(0.5, 0.5);
+            pedestrian7.scale.setTo(0.70,0.70);
+            game.physics.arcade.enable(pedestrian7);
+            pedestrian7.body.immovable = true;
+            pedestrian7.frame = 0; //initially displays the first frame
+            pedestrian7.animations.add('move', [0, 1], 2, true); //loops through frames 1 and 2 at 2 frames per second.
+            pedestrian7.animations.play('move');
+/**/
         } 
 		
 		function createArrows(){	//terrible way of loading in all of the arrows into the game
@@ -784,32 +850,86 @@ window.onload = function() {
 
 			//UI elements
 			game.debug.text("player laps: "+ player.laps + "/3", 32, 32);
+            
+            //game.debug.text("player x: " + player.x + "", 32, 40);
+            //game.debug.text("player y: " + player.y + "", 32, 50);
 			powerUpText();
 			
-			//sample pedestrian movement
-			//TODO: make more pedestrian objects.
-			if(samplePedestrian.body.x <= 850)
-			{
+			//pedestrian movement
+			if(samplePedestrian.body.x <= 850){
 				samplePedestrian.body.velocity.x = 160;
 			}
-            		if(samplePedestrian.body.x >= 1020)
-        		 {
-        		 	samplePedestrian.body.velocity.x = -160;
-            		 }
-
+            if(samplePedestrian.body.x >= 1020){
+        	 	samplePedestrian.body.velocity.x = -160;
+            }
+			
+            if(pedestrian1.body.y <= 1380){
+				pedestrian1.body.velocity.y = 140;
+			}
+            if(pedestrian1.body.y >= 1480){
+        	 	pedestrian1.body.velocity.y = -140;
+            }
+           
+            if(pedestrian2.body.x <= 8990){
+				pedestrian2.body.velocity.x = 160;
+			}
+            if(pedestrian2.body.x >= 9200){
+        	 	pedestrian2.body.velocity.x = -160;
+            }
+           
+            if(pedestrian3.body.x <= 8590){
+				pedestrian3.body.velocity.x = 130;
+			}
+            if(pedestrian3.body.x >= 8770){
+        	 	pedestrian3.body.velocity.x = -130;
+            }
+            
+            if(pedestrian4.body.x <= 8590){
+				pedestrian4.body.velocity.x = 130;
+			}
+            if(pedestrian4.body.x >= 8770){
+        	 	pedestrian4.body.velocity.x = -130;
+            }
+            
+            if(pedestrian5.body.y <= 6660){
+				pedestrian5.body.velocity.y = 240;
+			}
+            if(pedestrian5.body.y >= 7000){
+        	 	pedestrian5.body.velocity.y = -240;
+            }            
+            
+            if(pedestrian6.body.x <= 5165){
+				pedestrian6.body.velocity.x = 160;
+			}
+            if(pedestrian6.body.x >= 5360){
+        	 	pedestrian6.body.velocity.x = -160;
+            }
+            
+            if(pedestrian7.body.y <= 8290){
+				pedestrian7.body.velocity.y = 130;
+			}
+            if(pedestrian7.body.y >= 8375){
+        	 	pedestrian7.body.velocity.y = -130;            
+            }          
+/**/
 			// check for collisions
 			var hitObstacle = game.physics.arcade.collide(player, obstacles);
 			var hitBoundaries = game.physics.arcade.collide(player, boundaries);
-			var hitMoving_Obstacle = game.physics.arcade.collide(player, samplePedestrian);
-			var powerUpOverlap = game.physics.arcade.overlap(player, powerUps, getPowerUp, function () { return !gotPow; });		
+			var hitMoving_Obstacle = game.physics.arcade.collide(player, moving_obstacles);
+            //var hitMoving_Obstacle1 = game.physics.arcade.collide(player, pedestrian1);
+            var powerUpOverlap = game.physics.arcade.overlap(player, powerUps, getPowerUp, function () { return !gotPow; });		
 			
 			if(hitObstacle == true && koolaid == false)
 			{
 				speed = 0;
 			}
-			if(hitMoving_Obstacle == true && koolaid == false){
+			if(hitMoving_Obstacle == true && koolaid == false)
+            {
                 speed = 0;
             }
+            //if(hitMoving_Obstacle1 == true && koolaid == false){
+            //    speed = 0;
+            //}
 			//update server of the players new location
 			socket.emit('movePlayer', { x: player.x, y: player.y, angle: player.angle, laps: player.laps});
 		}
