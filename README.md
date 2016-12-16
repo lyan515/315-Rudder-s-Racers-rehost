@@ -1,4 +1,9 @@
-# Rudders Racers  
+# Rudders Racers 
+
+A rehost of my group project that was previously inaccessable due to it being on github.tamu.edu
+Team f-502: The I Don't Knows
+Ryan Branson, Brent Lanson, Andrew Meserole, and Travis Stebbins
+
 ##View Deliverables
 To clone directory:  
 `git clone git@github.tamu.edu:ameserole/315-game-TheIDontKnows.git`  
