@@ -6,6 +6,8 @@ Team f-502: The I Don't Knows
 
 Ryan Branson, Brent Lanson, Andrew Meserole, and Travis Stebbins
 
+Idea Mache: https://ideamache.ecologylab.net/e/sDnlrZqZZS/
+
 ##View Deliverables
 To clone directory:  
 `git clone git@github.tamu.edu:ameserole/315-game-TheIDontKnows.git`  
